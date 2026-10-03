@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>كرة الحارة</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #16a34a; --green-dark: #14532d; --green-light: #22c55e;
+  --red: #dc2626; --red-dark: #991b1b;
+}
+body {
+  background: linear-gradient(135deg, #052e16 0%, #14532d 60%, #166534 100%);
+  color: #fff; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+  min-height: 100vh; padding: 16px; direction: rtl;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+.header {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px); border-radius: 16px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon {
+  background: var(--green); width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-icon svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2; }
+.logo-text h1 { font-size: 1.25rem; font-weight: 900; }
+.logo-text p { font-size: 0.75rem; color: #86efac; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+  cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
+  font-family: inherit;
+}
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { background: #15803d; transform: translateY(-2px); }
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: var(--red-dark); transform: translateY(-2px); }
+.players-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px;
+}
+.player-card {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px); border-radius: 16px; padding: 16px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.player-card:hover { transform: translateY(-4px); border-color: var(--green-light); }
+.player-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.player-photo {
+  width: 70px; height: 70px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--green); background: #0f3d20;
+}
+.player-info { flex: 1; min-width: 0; }
+.player-name { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+.badge-حارس { background: #f59e0b; color: #422006; }
+.badge-مدافع { background: #3b82f6; color: #fff; }
+.badge-وسط { background: var(--green); color: #fff; }
+.badge-مهاجم { background: var(--red); color: #fff; }
+.overall-circle {
+  width: 56px; height: 56px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-weight: 900;
+  font-size: 1.3rem; border: 3px solid var(--green-light);
+  background: rgba(0,0,0,0.3);
+}
+.stats { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.stat-row { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+.stat-label { width: 90px; color: #86efac; font-weight: 600; }
+.stat-bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s; }
+.stat-value { width: 30px; text-align: left; font-weight: 700; }
+.empty {
+  text-align: center; padding: 60px 20px; color: #86efac;
+  background: rgba(255,255,255,0.05); border-radius: 16px;
+  border: 1px dashed rgba(255,255,255,0.2);
+}
+.empty svg { width: 60px; height: 60px; stroke: #86efac; fill: none; stroke-width: 1.5; margin-bottom: 16px; }
+.empty h2 { font-size: 1.2rem; margin-bottom: 8px; color: #fff; }
+.empty p { font-size: 0.9rem; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>كرة الحارة</h1>
+        <p>تقييم لاعبي الحارة</p>
+      </div>
+    </div>
+    <a href="admin.html" class="btn btn-red">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      إدارة
+    </a>
+  </header>
+
+  <div id="content"></div>
+</div>
+
+<script>
+const STORAGE_KEY = "harey_players";
+
+function getPlayers() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function calcOverall(p) {
+  const s = p.stats;
+  return Math.round((s.strength + s.shotPower + s.pace + s.dribbling + s.passing + s.defense) / 6);
+}
+
+function statColor(v) {
+  if (v >= 85) return "#22c55e";
+  if (v >= 70) return "#84cc16";
+  if (v >= 55) return "#eab308";
+  if (v >= 40) return "#f97316";
+  return "#dc2626";
+}
+
+const STAT_LABELS = {
+  strength: "القوة البدنية",
+  shotPower: "قوة الفراب",
+  pace: "السرعة",
+  dribbling: "المراوغة",
+  passing: "التمرير",
+  defense: "الدفاع"
+};
+
+function render() {
+  const players = getPlayers().sort((a, b) => calcOverall(b) - calcOverall(a));
+  const content = document.getElementById("content");
+
+  if (players.length === 0) {
+    content.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2a10 10 0 0 0 0 20M2 12h20"/>
+        </svg>
+        <h2>ما فيه لاعبين بعد</h2>
+        <p>روح لصفحة الإدارة وأضف أول لاعب</p>
+        <a href="admin.html" class="btn btn-green">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          إضافة لاعب
+        </a>
+      </div>`;
+    return;
+  }
+
+  content.innerHTML = `<div class="players-grid">${players.map(cardHTML).join("")}</div>`;
+}
+
+function cardHTML(p) {
+  const overall = calcOverall(p);
+  const statsHTML = Object.keys(STAT_LABELS).map(key => {
+    const v = p.stats[key] || 0;
+    return `
+      <div class="stat-row">
+        <div class="stat-label">${STAT_LABELS[key]}</div>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" style="width:${v}%;background:${statColor(v)}"></div>
+        </div>
+        <div class="stat-value">${v}</div>
+      </div>`;
+  }).join("");
+
+  const photo = p.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2314532d'><circle cx='12' cy='8' r='4'/><path d='M4 22c0-4 4-7 8-7s8 3 8 7'/></svg>";
+
+  return `
+    <div class="player-card">
+      <div class="player-card-top">
+        <img class="player-photo" src="${photo}" alt="${p.name}" />
+        <div class="player-info">
+          <div class="player-name">${p.name}</div>
+          <span class="badge badge-${p.position}">${p.position}</span>
+        </div>
+        <div class="overall-circle" style="border-color:${statColor(overall)}">${overall}</div>
+      </div>
+      <div class="stats">${statsHTML}</div>
+    </div>`;
+}
+
+render();
+</script>
+</body>
+</html>
