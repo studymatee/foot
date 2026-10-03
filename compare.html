@@ -1,1 +1,663 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>قارن اللاعبين ⚖️</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #16a34a; --green-bright: #22c55e; --green-deep: #15803d; --green-light: #dcfce7;
+  --red: #dc2626; --red-bright: #ef4444; --red-light: #fee2e2;
+  --blue: #3b82f6; --blue-light: #dbeafe;
+  --gold: #f59e0b; --gold-light: #fef3c7;
+  --purple: #8b5cf6; --purple-light: #ede9fe;
+  --bg: #f8fafc; --card: #ffffff; --text: #0f172a;
+  --text-muted: #64748b; --border: #e2e8f0;
+}
+body {
+  font-family: 'Cairo', system-ui, sans-serif; color: var(--text);
+  background: var(--bg); min-height: 100vh; padding: 20px;
+  direction: rtl; position: relative; overflow-x: hidden;
+}
+body::before, body::after {
+  content: ""; position: fixed; border-radius: 50%;
+  filter: blur(120px); z-index: 0; pointer-events: none;
+}
+body::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%);
+  top: -150px; right: -150px;
+}
+body::after {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(34,197,94,0.2), transparent 70%);
+  bottom: -200px; left: -200px;
+}
+.grid-bg {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(22,163,74,0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(22,163,74,0.06) 1px, transparent 1px);
+  background-size: 45px 45px; z-index: 0; pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
 
+.header {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 18px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+  box-shadow: 0 10px 40px rgba(15,23,42,0.08);
+}
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--purple), #6d28d9);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(139,92,246,0.4);
+}
+.logo-icon svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.logo-text h1 {
+  font-size: 1.3rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--purple), #6d28d9);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-text p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+.nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 14px;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none;
+  transition: all 0.25s; text-decoration: none; font-family: inherit; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-white { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
+.btn-white:hover { transform: translateY(-2px); background: var(--green-light); }
+.btn-purple { background: linear-gradient(135deg, var(--purple), #6d28d9); color: #fff; box-shadow: 0 4px 12px rgba(139,92,246,0.35); }
+.btn-purple:hover { transform: translateY(-2px); }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 24px; margin-bottom: 22px;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.06);
+}
+.card h2 {
+  font-size: 1.15rem; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px; font-weight: 800;
+}
+.card h2 svg { width: 22px; height: 22px; stroke: var(--purple); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ===== Pickers ===== */
+.pickers {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+@media (max-width: 640px) { .pickers { grid-template-columns: 1fr; } }
+
+.picker-box {
+  background: #f8fafc; border: 2px dashed var(--border);
+  border-radius: 18px; padding: 18px;
+  text-align: center;
+  transition: all 0.25s;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.picker-box.filled { border-style: solid; background: #fff; }
+.picker-box.left.filled { border-color: var(--green); }
+.picker-box.right.filled { border-color: var(--red); }
+
+.picker-label {
+  font-size: 0.75rem; font-weight: 900; margin-bottom: 12px;
+  color: var(--text-muted); letter-spacing: 1px;
+}
+.picker-box.left .picker-label { color: var(--green-deep); }
+.picker-box.right .picker-label { color: var(--red); }
+
+.picker-placeholder {
+  color: var(--text-muted); font-weight: 700; font-size: 0.9rem;
+}
+.picker-placeholder svg { width: 44px; height: 44px; stroke: currentColor; fill: none; stroke-width: 1.5; margin-bottom: 8px; }
+
+.picker-photo {
+  width: 80px; height: 80px; border-radius: 20px;
+  object-fit: cover; margin-bottom: 10px;
+  border: 3px solid var(--border);
+}
+.picker-box.left .picker-photo { border-color: var(--green); }
+.picker-box.right .picker-photo { border-color: var(--red); }
+
+.picker-name { font-size: 1.1rem; font-weight: 900; margin-bottom: 4px; }
+.picker-pos { font-size: 0.78rem; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; }
+
+.picker-remove {
+  background: var(--red-light); color: var(--red);
+  border: none; padding: 6px 14px; border-radius: 10px;
+  font-weight: 700; font-size: 0.75rem; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+}
+.picker-remove:hover { background: var(--red); color: #fff; }
+
+/* Players grid to choose */
+.players-selector {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px; max-height: 400px; overflow-y: auto;
+  padding: 4px;
+}
+.player-select-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; border-radius: 12px;
+  border: 2px solid var(--border); background: #fff;
+  cursor: pointer; transition: all 0.2s;
+}
+.player-select-item:hover { border-color: var(--purple); transform: translateY(-2px); }
+.player-select-item img {
+  width: 40px; height: 40px; border-radius: 12px; object-fit: cover;
+  border: 2px solid var(--border); flex-shrink: 0;
+}
+.player-select-item .name { font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-select-item .pos { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; }
+
+/* ===== Comparison ===== */
+.comparison {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 20px; align-items: start;
+}
+@media (max-width: 640px) { .comparison { grid-template-columns: 1fr; } }
+
+.comp-side {
+  background: #fff; border: 2px solid var(--border);
+  border-radius: 22px; padding: 20px; text-align: center;
+  transition: all 0.3s;
+}
+.comp-side.win { border-color: var(--green); background: linear-gradient(160deg, #fff, var(--green-light)); box-shadow: 0 12px 32px rgba(22,163,74,0.15); }
+.comp-side.lose { border-color: var(--border); opacity: 0.85; }
+
+.comp-photo {
+  width: 100px; height: 100px; border-radius: 24px; object-fit: cover;
+  border: 3px solid var(--green); margin-bottom: 12px;
+}
+.comp-side.lose .comp-photo { border-color: var(--border); }
+
+.comp-name { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; }
+.comp-pos { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; }
+
+.comp-overall {
+  width: 70px; height: 70px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.6rem; margin: 0 auto 14px;
+  background: radial-gradient(circle, #fff, #f1f5f9);
+  position: relative;
+  box-shadow: 0 6px 16px rgba(15,23,42,0.1);
+}
+.comp-overall::before {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%;
+  padding: 3px;
+  background: conic-gradient(from 180deg, var(--ring-color), transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+
+/* VS */
+.vs-circle {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), #6d28d9);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.2rem;
+  box-shadow: 0 8px 24px rgba(139,92,246,0.4);
+  align-self: center;
+}
+@media (max-width: 640px) { .vs-circle { margin: 0 auto; } }
+
+/* Stat rows */
+.stats-compare {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-top: 20px;
+}
+.stat-line {
+  display: grid;
+  grid-template-columns: 60px 1fr 60px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 14px;
+  transition: all 0.25s;
+}
+.stat-line:hover { background: var(--green-light); }
+
+.stat-side-val {
+  font-weight: 900; font-size: 1.1rem; text-align: center;
+}
+.stat-side-val.win { color: var(--green-deep); }
+.stat-side-val.lose { color: var(--text-muted); }
+
+.stat-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-bars-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.stat-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  position: relative;
+}
+.stat-bar.left { direction: rtl; }
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(.4,0,.2,1);
+}
+.stat-bar-fill.left { background: linear-gradient(90deg, var(--green-bright), var(--green-deep)); }
+.stat-bar-fill.right { background: linear-gradient(90deg, var(--red-bright), var(--red)); }
+
+.stat-name {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Winner Banner */
+.winner-banner {
+  text-align: center; padding: 24px;
+  background: linear-gradient(135deg, var(--green-light), #bbf7d0);
+  border: 2px solid var(--green-bright);
+  border-radius: 20px;
+  margin-top: 20px;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  flex-wrap: wrap;
+  animation: fadeIn 0.5s;
+}
+.winner-banner svg { width: 44px; height: 44px; stroke: var(--green-deep); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.winner-banner h3 { font-size: 1.4rem; color: var(--green-deep); }
+.winner-banner p { color: var(--green-deep); font-weight: 700; width: 100%; font-size: 0.9rem; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Radar Chart */
+.radar-wrap {
+  display: flex; justify-content: center;
+  padding: 20px 0;
+}
+.radar-svg { max-width: 400px; width: 100%; height: auto; }
+
+/* Empty */
+.empty {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted); font-weight: 600;
+}
+.empty svg { width: 60px; height: 60px; stroke: var(--purple); fill: none; stroke-width: 1.5; margin-bottom: 16px; }
+.empty h2 { font-size: 1.3rem; color: var(--text); margin-bottom: 8px; }
+
+/* Loading */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 4px solid rgba(139,92,246,0.2);
+  border-top-color: var(--purple);
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  body { padding: 12px; }
+  .header { padding: 14px 16px; }
+  .logo-text h1 { font-size: 1.1rem; }
+  .card { padding: 18px; }
+  .comp-photo { width: 80px; height: 80px; }
+  .comp-overall { width: 60px; height: 60px; font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>قارن اللاعبين</h1>
+        <p>شوف مين الأقوى ⚖️</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        الرئيسية
+      </a>
+      <a href="leaderboard.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        الترتيب
+      </a>
+    </div>
+  </header>
+
+  <div id="content">
+    <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ncrycgbrstafdouvipzc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73";
+
+let allPlayers = [];
+let pickA = null;
+let pickB = null;
+
+function calcOverall(p) {
+  return Math.round((p.strength + p.shot_power + p.pace + p.dribbling + p.passing + p.defense) / 6);
+}
+
+function statColor(v) {
+  if (v >= 85) return "#22c55e";
+  if (v >= 70) return "#84cc16";
+  if (v >= 55) return "#eab308";
+  if (v >= 40) return "#f97316";
+  return "#dc2626";
+}
+
+function defaultPhoto() {
+  return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23dcfce7"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4 4-7 8-7s8 3 8 7" fill="none" stroke="%2316a34a" stroke-width="1.5"/></svg>';
+}
+
+function escapeHTML(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+const STAT_LABELS = {
+  pace: "السرعة",
+  shot_power: "قوة الفراب",
+  passing: "التمرير",
+  dribbling: "المراوغة",
+  defense: "الدفاع",
+  strength: "القوة البدنية"
+};
+
+// ===== Load =====
+async function loadPlayers() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/players?select=*&order=name.asc`, {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+    });
+    allPlayers = await res.json() || [];
+    render();
+  } catch (e) {
+    document.getElementById("content").innerHTML = `<div class="loading">خطأ: ${e.message}</div>`;
+  }
+}
+
+// ===== Render =====
+function render() {
+  const content = document.getElementById("content");
+
+  if (allPlayers.length < 2) {
+    content.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>
+        <h2>ما فيه لاعبين كافيين</h2>
+        <p>لازم على الأقل لاعبين باش تقارن</p>
+      </div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <!-- Pickers -->
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        اختار لاعبين
+      </h2>
+      <div class="pickers">
+        ${pickerHTML("left", pickA)}
+        ${pickerHTML("right", pickB)}
+      </div>
+    </div>
+
+    <!-- Players selector -->
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+        اللاعبين المتوفرين — اضغط على لاعب
+      </h2>
+      <div class="players-selector" id="playersSelector"></div>
+    </div>
+
+    <!-- Comparison -->
+    ${pickA !== null && pickB !== null ? comparisonHTML() : ''}
+  `;
+
+  renderPlayersSelector();
+}
+
+function pickerHTML(side, idx) {
+  if (idx === null) {
+    return `
+      <div class="picker-box ${side}">
+        <div class="picker-label">${side === "left" ? "الأول" : "الثاني"}</div>
+        <div class="picker-placeholder">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          <div>اختار لاعب من تحت</div>
+        </div>
+      </div>`;
+  }
+  const p = allPlayers[idx];
+  return `
+    <div class="picker-box ${side} filled">
+      <div class="picker-label">${side === "left" ? "الأول" : "الثاني"}</div>
+      <img class="picker-photo" src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+      <div class="picker-name">${escapeHTML(p.name)}</div>
+      <div class="picker-pos">${p.position} · ${calcOverall(p)}</div>
+      <button class="picker-remove" onclick="clearSide('${side}')">تغيير</button>
+    </div>
+  `;
+}
+
+function renderPlayersSelector() {
+  const sel = document.getElementById("playersSelector");
+  if (!sel) return;
+  sel.innerHTML = allPlayers.map((p, i) => `
+    <div class="player-select-item" onclick="pickPlayer(${i})">
+      <img src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+      <div>
+        <div class="name">${escapeHTML(p.name)}</div>
+        <div class="pos">${p.position}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+window.pickPlayer = function(idx) {
+  if (pickA === null) pickA = idx;
+  else if (pickB === null) pickB = idx;
+  else {
+    // بدّل B
+    pickB = idx;
+  }
+  render();
+};
+
+window.clearSide = function(side) {
+  if (side === "left") pickA = null;
+  else pickB = null;
+  render();
+};
+
+// ===== Comparison =====
+function comparisonHTML() {
+  const a = allPlayers[pickA];
+  const b = allPlayers[pickB];
+  const oA = calcOverall(a);
+  const oB = calcOverall(b);
+  const aWins = oA > oB;
+  const bWins = oB > oA;
+
+  const statsHTML = Object.keys(STAT_LABELS).map(key => {
+    const vA = a[key] || 0;
+    const vB = b[key] || 0;
+    const aWin = vA > vB;
+    const bWin = vB > vA;
+    return `
+      <div class="stat-line">
+        <div class="stat-side-val ${aWin ? 'win' : bWin ? 'lose' : ''}">${vA}</div>
+        <div class="stat-bar-wrap">
+          <div class="stat-bars-row">
+            <div class="stat-bar left">
+              <div class="stat-bar-fill left" style="width:${vA}%; margin-right:auto"></div>
+            </div>
+            <div class="stat-bar right">
+              <div class="stat-bar-fill right" style="width:${vB}%"></div>
+            </div>
+          </div>
+          <div class="stat-name">${STAT_LABELS[key]}</div>
+        </div>
+        <div class="stat-side-val ${bWin ? 'win' : aWin ? 'lose' : ''}">${vB}</div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>
+        المقارنة
+      </h2>
+      <div class="comparison">
+        <div class="comp-side ${aWins ? 'win' : bWins ? 'lose' : ''}">
+          <img class="comp-photo" src="${a.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+          <div class="comp-name">${escapeHTML(a.name)}</div>
+          <div class="comp-pos">${a.position}</div>
+          <div class="comp-overall" style="--ring-color:${statColor(oA)};color:${statColor(oA)}">${oA}</div>
+          ${aWins ? `<div style="color:var(--green-deep);font-weight:900">🏆 الأقوى</div>` : ''}
+        </div>
+        <div class="vs-circle">VS</div>
+        <div class="comp-side ${bWins ? 'win' : aWins ? 'lose' : ''}">
+          <img class="comp-photo" src="${b.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+          <div class="comp-name">${escapeHTML(b.name)}</div>
+          <div class="comp-pos">${b.position}</div>
+          <div class="comp-overall" style="--ring-color:${statColor(oB)};color:${statColor(oB)}">${oB}</div>
+          ${bWins ? `<div style="color:var(--green-deep);font-weight:900">🏆 الأقوى</div>` : ''}
+        </div>
+      </div>
+
+      <!-- Radar -->
+      <div class="radar-wrap">
+        ${radarChart(a, b)}
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-compare">
+        ${statsHTML}
+      </div>
+
+      ${aWins || bWins ? `
+        <div class="winner-banner">
+          <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          <h3>${aWins ? a.name : b.name} هو الأقوى</h3>
+          <p>فرق التقييم: ${Math.abs(oA - oB)} نقطة</p>
+        </div>
+      ` : `
+        <div class="winner-banner" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#f59e0b">
+          <svg viewBox="0 0 24 24" style="stroke:#92400e"><circle cx="12" cy="12" r="10"/></svg>
+          <h3 style="color:#92400e">تعادل! نفس التقييم</h3>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// ===== Radar Chart =====
+function radarChart(a, b) {
+  const keys = Object.keys(STAT_LABELS);
+  const size = 400;
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = 130;
+  const n = keys.length;
+
+  const angleFor = (i) => (Math.PI * 2 * i) / n - Math.PI / 2;
+  const point = (i, value) => {
+    const angle = angleFor(i);
+    const r = (value / 100) * radius;
+    return {
+      x: cx + Math.cos(angle) * r,
+      y: cy + Math.sin(angle) * r
+    };
+  };
+
+  // شبكة
+  const gridLevels = [20, 40, 60, 80, 100];
+  const gridHTML = gridLevels.map(level => {
+    const pts = keys.map((_, i) => {
+      const p = point(i, level);
+      return `${p.x},${p.y}`;
+    }).join(" ");
+    return `<polygon points="${pts}" fill="none" stroke="#e2e8f0" stroke-width="1"/>`;
+  }).join("");
+
+  // خطوط من المركز
+  const axisHTML = keys.map((_, i) => {
+    const p = point(i, 100);
+    return `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#e2e8f0" stroke-width="1"/>`;
+  }).join("");
+
+  // Polygon للاعب A
+  const polyA = keys.map((k, i) => {
+    const p = point(i, a[k] || 0);
+    return `${p.x},${p.y}`;
+  }).join(" ");
+
+  // Polygon للاعب B
+  const polyB = keys.map((k, i) => {
+    const p = point(i, b[k] || 0);
+    return `${p.x},${p.y}`;
+  }).join(" ");
+
+  // Labels
+  const labelsHTML = keys.map((k, i) => {
+    const p = point(i, 120);
+    return `<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="#64748b" font-family="Cairo">${STAT_LABELS[k]}</text>`;
+  }).join("");
+
+  return `
+    <svg class="radar-svg" viewBox="0 0 ${size} ${size}">
+      ${gridHTML}
+      ${axisHTML}
+      <polygon points="${polyA}" fill="rgba(22,163,74,0.25)" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
+      <polygon points="${polyB}" fill="rgba(220,38,38,0.2)" stroke="#dc2626" stroke-width="2.5" stroke-linejoin="round"/>
+      ${labelsHTML}
+    </svg>
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:16px;font-weight:700;font-size:0.85rem">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:16px;height:16px;background:#16a34a;border-radius:4px;display:inline-block"></span>
+        ${escapeHTML(a.name)}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:16px;height:16px;background:#dc2626;border-radius:4px;display:inline-block"></span>
+        ${escapeHTML(b.name)}
+      </div>
+    </div>
+  `;
+}
+
+loadPlayers();
+</script>
+</body>
+</html>
