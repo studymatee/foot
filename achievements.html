@@ -83,7 +83,6 @@ body::after {
 .btn-white { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
 .btn-white:hover { transform: translateY(-2px); background: var(--green-light); }
 
-/* Tabs */
 .tabs {
   display: flex; gap: 8px; margin-bottom: 22px;
   overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;
@@ -119,7 +118,7 @@ body::after {
 }
 .card h2 svg { width: 22px; height: 22px; stroke: var(--gold-3); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* ========== Podium ========== */
+/* Podium */
 .podium {
   display: grid;
   grid-template-columns: 1fr 1.15fr 1fr;
@@ -190,7 +189,7 @@ body::after {
 }
 .podium-points svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.5; }
 
-/* ========== Ranking Table ========== */
+/* Table */
 .rank-table {
   width: 100%; border-collapse: collapse;
   background: #fff; border-radius: 18px;
@@ -236,7 +235,7 @@ body::after {
 .td-num.purple { color: #6d28d9; }
 .td-num.gold { color: var(--gold-3); }
 
-/* ========== Achievements Grid ========== */
+/* Achievements Grid */
 .ach-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -332,7 +331,6 @@ body::after {
 .legend-text { font-size: 0.82rem; font-weight: 800; }
 .legend-text span { color: var(--text-muted); font-size: 0.72rem; display: block; font-weight: 700; }
 
-/* Empty */
 .empty {
   text-align: center; padding: 60px 20px;
   color: var(--text-muted); font-weight: 600;
@@ -340,7 +338,6 @@ body::after {
 .empty svg { width: 60px; height: 60px; stroke: var(--gold-2); fill: none; stroke-width: 1.5; margin-bottom: 16px; }
 .empty h2 { font-size: 1.3rem; color: var(--text); margin-bottom: 8px; }
 
-/* Loading */
 .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
 .spinner {
   width: 44px; height: 44px; border-radius: 50%;
@@ -418,6 +415,32 @@ let allEvents = [];
 let allAchievements = [];
 let currentTab = "points";
 
+// ===== دالة آمنة للجلب =====
+async function fetchSafe(table, query = "") {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/${table}${query ? "?" + query : ""}`;
+    const res = await fetch(url, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (!res.ok) {
+      console.error(`خطأ في ${table}: ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.error(`${table} ماشي array:`, data);
+      return [];
+    }
+    return data;
+  } catch (e) {
+    console.error(`فشل ${table}:`, e);
+    return [];
+  }
+}
+
 function defaultPhoto() {
   return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fef3c7"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4 4-7 8-7s8 3 8 7" fill="none" stroke="%23d97706" stroke-width="1.5"/></svg>';
 }
@@ -431,7 +454,6 @@ function playerStats(pid) {
   const motm = ev.filter(e => e.event_type === "motm").length;
   const yellow = ev.filter(e => e.event_type === "yellow").length;
   const red = ev.filter(e => e.event_type === "red").length;
-  // نظام النقاط: هدف=3، تمريرة=2، MOTM=5، أصفر=-1، أحمر=-3
   const points = goals * 3 + assists * 2 + motm * 5 - yellow - red * 3;
   return { goals, assists, motm, yellow, red, points };
 }
@@ -439,20 +461,14 @@ function playerStats(pid) {
 // ===== Load =====
 async function loadAll() {
   try {
-    const [pRes, eRes, aRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/players?select=*`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      }),
-      fetch(`${SUPABASE_URL}/rest/v1/events?select=*&order=event_date.desc`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      }),
-      fetch(`${SUPABASE_URL}/rest/v1/achievements?select=*&order=earned_at.desc`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      })
+    const [players, events, achievements] = await Promise.all([
+      fetchSafe("players", "select=*"),
+      fetchSafe("events", "select=*&order=event_date.desc"),
+      fetchSafe("achievements", "select=*&order=earned_at.desc")
     ]);
-    allPlayers = await pRes.json() || [];
-    allEvents = await eRes.json() || [];
-    allAchievements = await aRes.json() || [];
+    allPlayers = players;
+    allEvents = events;
+    allAchievements = achievements;
     render();
   } catch (e) {
     document.getElementById("content").innerHTML = `<div class="loading">خطأ: ${e.message}</div>`;
@@ -489,7 +505,6 @@ function renderPoints(content) {
 
   const top3 = ranked.slice(0, 3);
 
-  // ترتيب المنصة
   const podiumOrder = [];
   if (top3[1]) podiumOrder.push({ ...top3[1], rank: 2 });
   if (top3[0]) podiumOrder.push({ ...top3[0], rank: 1 });
@@ -501,8 +516,6 @@ function renderPoints(content) {
         const cls = p.rank === 1 ? "first" : p.rank === 2 ? "second" : "third";
         const crown = p.rank === 1 ? 
           '<path d="M2 18h20l-2-10-5 4-3-6-3 6-5-4z"/><path d="M4 22h16"/>' :
-          p.rank === 2 ?
-          '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>' :
           '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>';
         return `
           <div class="podium-item ${cls}">
@@ -624,7 +637,7 @@ function renderAchievements(content) {
   `;
 }
 
-// ===== System Explanation =====
+// ===== System =====
 function renderSystem(content) {
   content.innerHTML = `
     <div class="card">
@@ -665,8 +678,7 @@ function renderSystem(content) {
         </div>
       </div>
       <div style="padding:16px;background:var(--gold-light);border-radius:14px;font-size:0.85rem;font-weight:700;color:#78350f;line-height:1.7">
-        <strong>ملاحظة:</strong> النقاط تتحسب تلقائياً من الأحداث اللي يسجلها الأدمن في لوحة التحكم.<br>
-        كل هدف، تمريرة، رجل ماتش، أو بطاقة يتحسبو مباشرة في ترتيب النقاط.
+        <strong>ملاحظة:</strong> النقاط تتحسب تلقائياً من الأحداث اللي يسجلها الأدمن في لوحة التحكم.
       </div>
     </div>
 
@@ -677,26 +689,18 @@ function renderSystem(content) {
       </h2>
       <div class="ach-grid">
         ${[
-          { title: "هداف الشهر", desc: "أكثر لاعب يسجل أهداف في شهر", icon: "goal" },
-          { title: "أفضل صانع أهداف", desc: "أكثر لاعب يوزع تمريرات حاسمة", icon: "assist" },
-          { title: "أفضل مدافع", desc: "أفضل مدافع حسب التقييم", icon: "shield" },
-          { title: "أفضل حارس", desc: "أفضل حارس حسب التقييم", icon: "shield" },
-          { title: "أفضل لاعب في الشهر", desc: "الأفضل في كل شي", icon: "star" },
-          { title: "أكثر لاعب تطور", desc: "اللي تحسن مستواه بزاف", icon: "trending" },
-          { title: "الرجل الحديدي", desc: "اللي ما يغيبش على الماتشات", icon: "clock" },
-          { title: "القائد", desc: "قائد الفريق وروحه", icon: "shield" }
+          { title: "هداف الشهر", desc: "أكثر لاعب يسجل أهداف في شهر" },
+          { title: "أفضل صانع أهداف", desc: "أكثر لاعب يوزع تمريرات حاسمة" },
+          { title: "أفضل مدافع", desc: "أفضل مدافع حسب التقييم" },
+          { title: "أفضل حارس", desc: "أفضل حارس حسب التقييم" },
+          { title: "أفضل لاعب في الشهر", desc: "الأفضل في كل شي" },
+          { title: "أكثر لاعب تطور", desc: "اللي تحسن مستواه بزاف" },
+          { title: "الرجل الحديدي", desc: "اللي ما يغيبش على الماتشات" },
+          { title: "القائد", desc: "قائد الفريق وروحه" }
         ].map(a => `
           <div class="ach-card" style="opacity:0.85">
             <div class="ach-icon" style="background:linear-gradient(135deg,#94a3b8,#64748b);box-shadow:none">
-              <svg viewBox="0 0 24 24">
-                ${a.icon === "goal" ? '<circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/>' :
-                  a.icon === "assist" ? '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' :
-                  a.icon === "shield" ? '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' :
-                  a.icon === "star" ? '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' :
-                  a.icon === "trending" ? '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>' :
-                  a.icon === "clock" ? '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' :
-                  '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'}
-              </svg>
+              <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
             </div>
             <div class="ach-title" style="color:var(--text)">${a.title}</div>
             <div class="ach-desc">${a.desc}</div>
