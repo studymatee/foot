@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة الترتيب 🏆</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #16a34a; --green-bright: #22c55e; --green-deep: #15803d; --green-light: #dcfce7;
+  --red: #dc2626; --red-bright: #ef4444; --red-light: #fee2e2;
+  --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+  --gold: #f59e0b; --silver: #94a3b8; --bronze: #b45309;
+}
+body {
+  font-family: 'Cairo', system-ui, sans-serif; color: var(--text);
+  background: var(--bg); min-height: 100vh; padding: 20px; direction: rtl;
+  position: relative; overflow-x: hidden;
+}
+body::before, body::after {
+  content: ""; position: fixed; border-radius: 50%;
+  filter: blur(120px); z-index: 0; pointer-events: none;
+}
+body::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(34,197,94,0.25), transparent 70%);
+  top: -150px; right: -150px;
+}
+body::after {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(239,68,68,0.18), transparent 70%);
+  bottom: -200px; left: -200px;
+}
+.grid-bg {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(22,163,74,0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(22,163,74,0.06) 1px, transparent 1px);
+  background-size: 45px 45px; z-index: 0; pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.container { max-width: 1000px; margin: 0 auto; position: relative; z-index: 1; }
+
+.header {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 18px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+  box-shadow: 0 10px 40px rgba(15,23,42,0.08);
+}
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--gold), #d97706);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+}
+.logo-icon svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.logo-text h1 {
+  font-size: 1.3rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold), #d97706);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-text p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+.nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 14px; font-weight: 700; font-size: 0.85rem;
+  cursor: pointer; border: none; transition: all 0.25s; text-decoration: none;
+  font-family: inherit; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-white { background: #fff; color: var(--green-deep); box-shadow: 0 4px 12px rgba(15,23,42,0.08); border: 1px solid var(--border); }
+.btn-white:hover { transform: translateY(-2px); background: var(--green-light); }
+.btn-green { background: linear-gradient(135deg, var(--green-bright), var(--green-deep)); color: #fff; box-shadow: 0 4px 12px rgba(22,163,74,0.35); }
+.btn-green:hover { transform: translateY(-2px); }
+
+/* Podium */
+.podium {
+  display: grid; grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 16px; margin-bottom: 28px; align-items: end;
+}
+.podium-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 20px 16px; text-align: center;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.08);
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.podium-item:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(15,23,42,0.15); }
+.podium-item.first { padding-top: 30px; padding-bottom: 30px; background: linear-gradient(160deg, #fffbeb, #fff); border: 2px solid var(--gold); }
+.podium-item.second { background: linear-gradient(160deg, #f1f5f9, #fff); border: 2px solid var(--silver); }
+.podium-item.third { background: linear-gradient(160deg, #fef3c7, #fff); border: 2px solid var(--bronze); }
+.podium-photo {
+  width: 80px; height: 80px; border-radius: 24px; object-fit: cover;
+  margin: 0 auto 12px; display: block;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.podium-item.first .podium-photo { width: 100px; height: 100px; border-color: var(--gold); }
+.podium-crown { font-size: 2rem; margin-bottom: 8px; }
+.podium-name { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
+.podium-item.first .podium-name { font-size: 1.15rem; }
+.podium-position { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+.podium-points {
+  display: inline-block; padding: 6px 14px; border-radius: 999px;
+  font-weight: 900; font-size: 0.9rem;
+  background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+}
+
+/* Categories */
+.category-tabs {
+  display: flex; gap: 8px; margin-bottom: 20px;
+  overflow-x: auto; padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 12px 20px; border-radius: 14px; border: 2px solid var(--border);
+  background: #fff; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+  transition: all 0.25s; font-family: inherit; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px; color: var(--text);
+}
+.tab:hover { border-color: var(--green-bright); transform: translateY(-2px); }
+.tab.active { background: linear-gradient(135deg, var(--green-bright), var(--green-deep)); color: #fff; border-color: transparent; box-shadow: 0 8px 20px rgba(22,163,74,0.35); }
+
+/* Leaderboard List */
+.leaderboard {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 20px;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.06);
+}
+.lb-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px; border-radius: 16px;
+  transition: all 0.25s; border: 1px solid transparent;
+}
+.lb-row:hover { background: var(--green-light); border-color: rgba(22,163,74,0.2); transform: translateX(-4px); }
+.lb-row + .lb-row { border-top: 1px solid var(--border); }
+.lb-rank {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1rem;
+  background: #f1f5f9; color: var(--text-muted); flex-shrink: 0;
+}
+.lb-rank.top1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,0.4); }
+.lb-rank.top2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #fff; }
+.lb-rank.top3 { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; }
+.lb-photo {
+  width: 52px; height: 52px; border-radius: 14px; object-fit: cover;
+  border: 2px solid var(--green-bright); background: var(--green-light);
+  flex-shrink: 0;
+}
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-weight: 800; font-size: 1rem; margin-bottom: 4px; }
+.lb-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+.lb-value {
+  font-weight: 900; font-size: 1.3rem; color: var(--green-deep);
+  background: var(--green-light); padding: 8px 16px; border-radius: 12px;
+  min-width: 70px; text-align: center;
+}
+.lb-value.gold { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 4px solid rgba(22,163,74,0.2);
+  border-top-color: var(--green);
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .podium { grid-template-columns: 1fr; }
+  .podium-item.first { order: -1; }
+  .lb-value { font-size: 1rem; padding: 6px 12px; min-width: 60px; }
+  .lb-photo { width: 44px; height: 44px; }
+  .header { padding: 14px 16px; }
+  .logo-text h1 { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>لوحة الترتيب</h1>
+        <p>أحسن لاعبين الحومة 🇩🇿</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        الرئيسية
+      </a>
+      <a href="matches.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        الماتشات
+      </a>
+    </div>
+  </header>
+
+  <div id="content">
+    <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const supabase = createClient(
+  'https://ncrycgbrstafdouvipzc.supabase.co',
+  'sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73'
+);
+
+let allPlayers = [];
+let currentTab = "overall";
+
+function calcOverall(p) {
+  return Math.round((p.strength + p.shot_power + p.pace + p.dribbling + p.passing + p.defense) / 6);
+}
+
+const CATEGORIES = {
+  overall: { label: "🔥 التقييم الكلي", icon: "🔥", getValue: p => calcOverall(p), unit: "" },
+  goals: { label: "⚽ الأهداف", icon: "⚽", getValue: p => p.goals || 0, unit: "هدف" },
+  assists: { label: "🎯 التمريرات الحاسمة", icon: "🎯", getValue: p => p.assists || 0, unit: "تمريرة" },
+  points: { label: "🏆 النقاط", icon: "🏆", getValue: p => p.points || 0, unit: "نقطة" },
+  pace: { label: "⚡ السرعة", icon: "⚡", getValue: p => p.pace, unit: "" },
+  shot_power: { label: "💥 قوة الفراب", icon: "💥", getValue: p => p.shot_power, unit: "" },
+  strength: { label: "💪 القوة البدنية", icon: "💪", getValue: p => p.strength, unit: "" },
+  dribbling: { label: "🎨 المراوغة", icon: "🎨", getValue: p => p.dribbling, unit: "" },
+  passing: { label: "🎩 التمرير", icon: "🎩", getValue: p => p.passing, unit: "" },
+  defense: { label: "🛡️ الدفاع", icon: "🛡️", getValue: p => p.defense, unit: "" }
+};
+
+function defaultPhoto() {
+  return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23dcfce7"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4 4-7 8-7s8 3 8 7"/></svg>';
+}
+
+function render() {
+  const content = document.getElementById("content");
+  const cat = CATEGORIES[currentTab];
+  const sorted = [...allPlayers].sort((a, b) => cat.getValue(b) - cat.getValue(a));
+
+  if (sorted.length === 0) {
+    content.innerHTML = '<div class="leaderboard"><p style="text-align:center;padding:40px;color:#94a3b8;font-weight:600">ما فيه لاعبين بعد 🥲</p></div>';
+    return;
+  }
+
+  const podium = sorted.slice(0, 3);
+  const rest = sorted.slice(3);
+  const order = [podium[1], podium[0], podium[2]];
+
+  let podiumHTML = '';
+  if (podium.length >= 3) {
+    podiumHTML = `<div class="podium">
+      ${order.map((p, i) => {
+        if (!p) return '';
+        const realRank = podium.indexOf(p);
+        const cls = realRank === 0 ? "first" : realRank === 1 ? "second" : "third";
+        const crown = realRank === 0 ? "👑" : realRank === 1 ? "🥈" : "🥉";
+        return `<div class="podium-item ${cls}">
+          <div class="podium-crown">${crown}</div>
+          <img class="podium-photo" src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+          <div class="podium-name">${p.name}</div>
+          <div class="podium-position">${p.position}</div>
+          <div class="podium-points">${cat.getValue(p)} ${cat.unit}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  } else {
+    podiumHTML = `<div class="podium" style="grid-template-columns:1fr">
+      ${podium.map(p => `<div class="podium-item first">
+        <div class="podium-crown">👑</div>
+        <img class="podium-photo" src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+        <div class="podium-name">${p.name}</div>
+        <div class="podium-position">${p.position}</div>
+        <div class="podium-points">${cat.getValue(p)} ${cat.unit}</div>
+      </div>`).join("")}
+    </div>`;
+  }
+
+  const tabsHTML = `<div class="category-tabs">
+    ${Object.keys(CATEGORIES).map(k => `<button class="tab ${k === currentTab ? 'active' : ''}" onclick="switchTab('${k}')">${CATEGORIES[k].label}</button>`).join("")}
+  </div>`;
+
+  const restHTML = rest.map((p, i) => {
+    const rank = i + 4;
+    return `<div class="lb-row">
+      <div class="lb-rank">${rank}</div>
+      <img class="lb-photo" src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+      <div class="lb-info">
+        <div class="lb-name">${p.name}</div>
+        <div class="lb-sub">${p.position}</div>
+      </div>
+      <div class="lb-value">${cat.getValue(p)} ${cat.unit}</div>
+    </div>`;
+  }).join("");
+
+  content.innerHTML = podiumHTML + tabsHTML + `<div class="leaderboard">${restHTML || '<p style="text-align:center;padding:20px;color:#94a3b8">مازال ما كملناش الترتيب</p>'}</div>`;
+}
+
+window.switchTab = function(tab) {
+  currentTab = tab;
+  render();
+};
+
+async function load() {
+  const { data, error } = await supabase.from("players").select("*");
+  if (error) {
+    document.getElementById("content").innerHTML = `<div class="loading">خطأ: ${error.message}</div>`;
+    return;
+  }
+  allPlayers = data || [];
+  render();
+}
+
+load();
+</script>
+</body>
+</html>
