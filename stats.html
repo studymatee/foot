@@ -80,7 +80,6 @@ body::after {
 .btn-white { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
 .btn-white:hover { transform: translateY(-2px); background: var(--green-light); }
 
-/* Tabs */
 .main-tabs {
   display: flex; gap: 8px; margin-bottom: 22px;
   overflow-x: auto; padding-bottom: 8px;
@@ -117,7 +116,6 @@ body::after {
 }
 .card h2 svg { width: 22px; height: 22px; stroke: var(--blue); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Big stat cards */
 .big-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -159,7 +157,6 @@ body::after {
 .big-stat-num { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 6px; }
 .big-stat-lbl { font-size: 0.82rem; color: var(--text-muted); font-weight: 700; }
 
-/* Rankings table */
 .rank-table {
   width: 100%;
   border-collapse: collapse;
@@ -215,7 +212,6 @@ body::after {
 .td-num.red { color: var(--red); }
 .td-num.purple { color: #6d28d9; }
 
-/* Goal log */
 .goal-log {
   display: flex; flex-direction: column; gap: 10px;
 }
@@ -265,7 +261,6 @@ body::after {
 .goal-item.red .goal-minute { color: var(--red); }
 .goal-item.motm .goal-minute { color: #d97706; }
 
-/* Form (best) */
 .form-row {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -304,7 +299,6 @@ body::after {
   color: var(--green-deep);
 }
 
-/* Filters */
 .filter-row {
   display: flex; gap: 10px; flex-wrap: wrap;
   margin-bottom: 16px;
@@ -321,14 +315,12 @@ body::after {
   color: #fff; border-color: transparent;
 }
 
-/* Empty */
 .empty {
   text-align: center; padding: 60px 20px;
   color: var(--text-muted); font-weight: 600;
 }
 .empty svg { width: 60px; height: 60px; stroke: var(--blue); fill: none; stroke-width: 1.5; margin-bottom: 16px; }
 
-/* Loading */
 .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
 .spinner {
   width: 44px; height: 44px; border-radius: 50%;
@@ -395,7 +387,7 @@ body::after {
     </button>
     <button class="main-tab" onclick="switchTab('goallog', this)">
       <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      سجل الأهداف
+      سجل الأحداث
     </button>
     <button class="main-tab" onclick="switchTab('forms', this)">
       <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -417,6 +409,32 @@ let allEvents = [];
 let allMatches = [];
 let currentTab = "overview";
 let goalFilter = "all";
+
+// ===== دالة آمنة للجلب =====
+async function fetchSafe(table, query = "") {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/${table}${query ? "?" + query : ""}`;
+    const res = await fetch(url, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (!res.ok) {
+      console.error(`خطأ في ${table}: ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.error(`${table} ماشي array:`, data);
+      return [];
+    }
+    return data;
+  } catch (e) {
+    console.error(`فشل ${table}:`, e);
+    return [];
+  }
+}
 
 function calcOverall(p) {
   return Math.round((p.strength + p.shot_power + p.pace + p.dribbling + p.passing + p.defense) / 6);
@@ -448,20 +466,14 @@ function avgRating(stats) {
 // ===== Load =====
 async function loadAll() {
   try {
-    const [pRes, eRes, mRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/players?select=*`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      }),
-      fetch(`${SUPABASE_URL}/rest/v1/events?select=*&order=event_date.desc`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      }),
-      fetch(`${SUPABASE_URL}/rest/v1/matches?select=*&order=match_date.desc`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      })
+    const [players, events, matches] = await Promise.all([
+      fetchSafe("players", "select=*"),
+      fetchSafe("events", "select=*&order=event_date.desc"),
+      fetchSafe("matches", "select=*&order=match_date.desc")
     ]);
-    allPlayers = await pRes.json() || [];
-    allEvents = await eRes.json() || [];
-    allMatches = await mRes.json() || [];
+    allPlayers = players;
+    allEvents = events;
+    allMatches = matches;
     render();
   } catch (e) {
     document.getElementById("content").innerHTML = `<div class="loading">خطأ: ${e.message}</div>`;
@@ -556,11 +568,10 @@ function renderOverview(content) {
 
 // ===== Scorers =====
 function renderScorers(content) {
-  const ranked = allPlayers.map(p => ({
-    ...p,
-    ...playerStats(p.id),
-    avg: avgRating(playerStats(p.id))
-  })).filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals);
+  const ranked = allPlayers.map(p => {
+    const s = playerStats(p.id);
+    return { ...p, ...s, avg: avgRating(s) };
+  }).filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals);
 
   if (ranked.length === 0) {
     content.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><h2>ما فيه أهداف بعد</h2></div>`;
@@ -613,11 +624,10 @@ function renderScorers(content) {
 
 // ===== Assists =====
 function renderAssists(content) {
-  const ranked = allPlayers.map(p => ({
-    ...p,
-    ...playerStats(p.id),
-    avg: avgRating(playerStats(p.id))
-  })).filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists);
+  const ranked = allPlayers.map(p => {
+    const s = playerStats(p.id);
+    return { ...p, ...s, avg: avgRating(s) };
+  }).filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists);
 
   if (ranked.length === 0) {
     content.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h2>ما فيه تمريرات بعد</h2></div>`;
@@ -671,7 +681,10 @@ function renderAssists(content) {
 // ===== Defenders =====
 function renderDefenders(content) {
   const ranked = allPlayers.filter(p => p.position === "مدافع" || p.position === "حارس")
-    .map(p => ({ ...p, ...playerStats(p.id), avg: avgRating(playerStats(p.id)) }))
+    .map(p => {
+      const s = playerStats(p.id);
+      return { ...p, ...s, avg: avgRating(s) };
+    })
     .sort((a, b) => {
       if (b.avg !== a.avg) return b.avg - a.avg;
       return b.defense - a.defense;
@@ -789,17 +802,14 @@ function renderGoalLog(content) {
   `;
 }
 
-// ===== Forms (آخر ماتشات) =====
+// ===== Forms =====
 function renderForms(content) {
-  // آخر 3 ماتشات
   const recentMatches = allMatches.slice(0, 3);
   
-  // نحسبو أفضل لاعبين في كل ماتش حسب التقييم
   const cards = recentMatches.map(m => {
     const matchEvents = allEvents.filter(e => e.match_id === m.id);
     const ratingEvents = matchEvents.filter(e => e.event_type === "rating");
     
-    // متوسط التقييم لكل لاعب
     const playerRatings = {};
     ratingEvents.forEach(r => {
       if (!playerRatings[r.player_id]) playerRatings[r.player_id] = [];
