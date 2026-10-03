@@ -611,4 +611,96 @@ function renderResults(shuffled, numTeams, per, animating) {
     let idx = 0;
     for (let i = 0; i < numTeams; i++) {
       const size = perTeamCount + (i < extra ? 1 : 0);
-     
+      teams.push(shuffled.slice(idx, idx + size));
+      idx += size;
+    }
+  } else {
+    // حدد عدد اللاعبين لكل فريق
+    const maxPerTeam = per;
+    let idx = 0;
+    for (let i = 0; i < numTeams; i++) {
+      if (idx >= total) {
+        teams.push([]);
+      } else {
+        teams.push(shuffled.slice(idx, idx + maxPerTeam));
+        idx += maxPerTeam;
+      }
+    }
+    // الباقي يضاف للفرق الأولى
+    if (idx < total) {
+      let leftover = shuffled.slice(idx);
+      let i = 0;
+      while (leftover.length > 0) {
+        teams[i % numTeams].push(leftover.shift());
+        i++;
+      }
+    }
+  }
+
+  section.innerHTML = `<div class="results" style="${animating ? 'filter: blur(1px);' : ''}">
+    ${teams.map((t, i) => teamBoxHTML(t, i)).join("")}
+  </div>`;
+}
+
+function teamBoxHTML(teamPlayers, index) {
+  const tNum = index + 1;
+  const tClass = `t${((index) % 8) + 1}`;
+  const teamNames = ["الفريق الأخضر", "الفريق الأحمر", "الفريق الأزرق", "الفريق الأصفر", "الفريق البنفسجي", "الفريق الوردي", "الفريق الفيروزي", "الفريق البرتقالي"];
+  const name = teamNames[index] || `الفريق ${tNum}`;
+  const icons = ["🟢", "🔴", "🔵", "🟡", "🟣", "🩷", "💎", "🟠"];
+  const icon = icons[index] || "⚽";
+
+  return `<div class="team-box ${tClass}" style="animation-delay:${index * 0.08}s">
+    <div class="team-header">
+      <div class="team-title">${icon} ${name}</div>
+      <div class="team-count">${teamPlayers.length} لاعبين</div>
+    </div>
+    <div class="team-players">
+      ${teamPlayers.length === 0 ? '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;padding:10px">فارغ</p>' : ''}
+      ${teamPlayers.map((p, i) => `
+        <div class="team-player">
+          <div class="team-player-num">${i + 1}</div>
+          <span>${escapeHTML(p)}</span>
+        </div>
+      `).join("")}
+    </div>
+  </div>`;
+}
+
+// ==== Toast ====
+let toastTimer;
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast " + (type === "error" ? "error" : "");
+  clearTimeout(toastTimer);
+  setTimeout(() => t.classList.add("show"), 10);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// ==== صوت ====
+function playShuffleSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523, 659, 784, 1047];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.08);
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.08);
+      gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + i * 0.08 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.3);
+      osc.start(ctx.currentTime + i * 0.08);
+      osc.stop(ctx.currentTime + i * 0.08 + 0.3);
+    });
+  } catch(e) {}
+}
+
+// ==== Init render ====
+renderChips();
+updateHint();
+</script>
+</body>
+</html>
