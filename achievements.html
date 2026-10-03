@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>الإنجازات والنقاط 🏅</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #16a34a; --green-bright: #22c55e; --green-deep: #15803d; --green-light: #dcfce7;
+  --red: #dc2626; --red-bright: #ef4444; --red-light: #fee2e2;
+  --blue: #3b82f6; --blue-light: #dbeafe;
+  --gold: #f59e0b; --gold-light: #fef3c7;
+  --gold-1: #fde68a; --gold-2: #fbbf24; --gold-3: #d97706;
+  --silver-1: #f1f5f9; --silver-2: #cbd5e1; --silver-3: #94a3b8;
+  --bronze-1: #fed7aa; --bronze-2: #fb923c; --bronze-3: #c2410c;
+  --purple: #8b5cf6; --purple-light: #ede9fe;
+  --bg: #f8fafc; --card: #ffffff; --text: #0f172a;
+  --text-muted: #64748b; --border: #e2e8f0;
+}
+body {
+  font-family: 'Cairo', system-ui, sans-serif; color: var(--text);
+  background: var(--bg); min-height: 100vh; padding: 20px;
+  direction: rtl; position: relative; overflow-x: hidden;
+}
+body::before, body::after {
+  content: ""; position: fixed; border-radius: 50%;
+  filter: blur(120px); z-index: 0; pointer-events: none;
+}
+body::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(245,158,11,0.25), transparent 70%);
+  top: -150px; right: -150px;
+}
+body::after {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%);
+  bottom: -200px; left: -200px;
+}
+.grid-bg {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(22,163,74,0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(22,163,74,0.06) 1px, transparent 1px);
+  background-size: 45px 45px; z-index: 0; pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+.header {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 18px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+  box-shadow: 0 10px 40px rgba(15,23,42,0.08);
+}
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+}
+.logo-icon svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.logo-text h1 {
+  font-size: 1.3rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--gold-3), var(--gold-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-text p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+.nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 14px;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none;
+  transition: all 0.25s; text-decoration: none; font-family: inherit; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-white { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
+.btn-white:hover { transform: translateY(-2px); background: var(--green-light); }
+
+/* Tabs */
+.tabs {
+  display: flex; gap: 8px; margin-bottom: 22px;
+  overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 12px 22px; border-radius: 14px;
+  border: 2px solid var(--border); background: #fff;
+  font-weight: 800; font-size: 0.85rem; cursor: pointer;
+  transition: all 0.25s; font-family: inherit; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px; color: var(--text);
+}
+.tab svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.tab:hover { border-color: var(--gold-2); transform: translateY(-2px); }
+.tab.active {
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 8px 20px rgba(245,158,11,0.35);
+}
+
+.panel { display: none; animation: fadeIn 0.3s; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 24px; margin-bottom: 22px;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.06);
+}
+.card h2 {
+  font-size: 1.15rem; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px; font-weight: 800;
+}
+.card h2 svg { width: 22px; height: 22px; stroke: var(--gold-3); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ========== Podium ========== */
+.podium {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+@media (max-width: 640px) { .podium { grid-template-columns: 1fr; } }
+
+.podium-item {
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  padding: 22px 16px;
+  text-align: center;
+  position: relative;
+  transition: all 0.35s;
+  overflow: hidden;
+}
+.podium-item:hover { transform: translateY(-6px); }
+.podium-item.first {
+  background: linear-gradient(160deg, #fffbeb, #fef3c7);
+  border-color: var(--gold-2);
+  padding: 34px 16px;
+  box-shadow: 0 15px 40px rgba(245,158,11,0.25);
+}
+.podium-item.second {
+  background: linear-gradient(160deg, #f8fafc, #f1f5f9);
+  border-color: var(--silver-2);
+}
+.podium-item.third {
+  background: linear-gradient(160deg, #fff7ed, #fed7aa);
+  border-color: var(--bronze-2);
+}
+@media (max-width: 640px) { .podium-item.first { order: -1; padding: 22px 16px; } }
+
+.podium-crown {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.podium-item.first .podium-crown { background: linear-gradient(135deg, var(--gold-2), var(--gold-3)); box-shadow: 0 8px 20px rgba(245,158,11,0.5); }
+.podium-item.second .podium-crown { background: linear-gradient(135deg, var(--silver-2), var(--silver-3)); }
+.podium-item.third .podium-crown { background: linear-gradient(135deg, var(--bronze-2), var(--bronze-3)); }
+.podium-crown svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.podium-photo {
+  width: 90px; height: 90px;
+  border-radius: 24px; object-fit: cover;
+  border: 3px solid #fff;
+  margin: 0 auto 12px;
+  display: block;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.podium-item.first .podium-photo { width: 110px; height: 110px; border-color: var(--gold-2); }
+
+.podium-name { font-size: 1.05rem; font-weight: 900; margin-bottom: 4px; }
+.podium-item.first .podium-name { font-size: 1.2rem; }
+.podium-pos { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; }
+.podium-points {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 999px;
+  font-weight: 900; font-size: 1rem;
+  background: linear-gradient(135deg, var(--purple), #6d28d9);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(139,92,246,0.4);
+}
+.podium-points svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.5; }
+
+/* ========== Ranking Table ========== */
+.rank-table {
+  width: 100%; border-collapse: collapse;
+  background: #fff; border-radius: 18px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+.rank-table thead tr { background: #f8fafc; }
+.rank-table th {
+  padding: 14px 12px; text-align: right;
+  font-weight: 800; font-size: 0.82rem;
+  border-bottom: 2px solid var(--border);
+}
+.rank-table th.center { text-align: center; }
+.rank-table td {
+  padding: 12px; border-bottom: 1px solid var(--border);
+  font-weight: 600; font-size: 0.9rem;
+}
+.rank-table tr:last-child td { border-bottom: none; }
+.rank-table tr:hover { background: var(--gold-light); }
+
+.rank-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 10px;
+  background: #f1f5f9; font-weight: 900; color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.rank-num.top1 { background: linear-gradient(135deg, var(--gold-2), var(--gold-3)); color: #fff; }
+.rank-num.top2 { background: linear-gradient(135deg, var(--silver-2), var(--silver-3)); color: #fff; }
+.rank-num.top3 { background: linear-gradient(135deg, var(--bronze-2), var(--bronze-3)); color: #fff; }
+
+.player-cell {
+  display: flex; align-items: center; gap: 10px;
+}
+.player-cell img {
+  width: 40px; height: 40px; border-radius: 12px; object-fit: cover;
+  border: 2px solid var(--gold-2); background: var(--gold-light); flex-shrink: 0;
+}
+.player-cell .name { font-weight: 800; font-size: 0.9rem; }
+.player-cell .pos { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; }
+
+.td-num { text-align: center; font-weight: 900; }
+.td-num.green { color: var(--green-deep); }
+.td-num.red { color: var(--red); }
+.td-num.purple { color: #6d28d9; }
+.td-num.gold { color: var(--gold-3); }
+
+/* ========== Achievements Grid ========== */
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ach-card {
+  background: linear-gradient(160deg, #fff, #fef9e7);
+  border: 2px solid var(--gold-2);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.ach-card::before {
+  content: "";
+  position: absolute;
+  top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(245,158,11,0.15), transparent 50%);
+  pointer-events: none;
+}
+.ach-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(245,158,11,0.25);
+}
+.ach-card > * { position: relative; z-index: 1; }
+
+.ach-icon {
+  width: 60px; height: 60px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 20px rgba(245,158,11,0.4);
+}
+.ach-icon svg { width: 30px; height: 30px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.ach-player {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.ach-player img {
+  width: 44px; height: 44px; border-radius: 12px; object-fit: cover;
+  border: 2px solid var(--gold-2);
+}
+.ach-player-info .name { font-weight: 900; font-size: 0.95rem; }
+.ach-player-info .pos { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; }
+
+.ach-title { font-size: 1.05rem; font-weight: 900; margin-bottom: 6px; color: var(--gold-3); }
+.ach-desc { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; line-height: 1.6; }
+
+.ach-date {
+  display: inline-block;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 4px 10px;
+  background: var(--gold-light);
+  color: var(--gold-3);
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* Points legend */
+.points-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.legend-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.legend-icon svg { width: 18px; height: 18px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.legend-icon.g { background: var(--green-light); } .legend-icon.g svg { stroke: var(--green-deep); }
+.legend-icon.b { background: var(--blue-light); } .legend-icon.b svg { stroke: #1d4ed8; }
+.legend-icon.y { background: var(--gold-light); } .legend-icon.y svg { stroke: var(--gold-3); }
+.legend-icon.r { background: var(--red-light); } .legend-icon.r svg { stroke: var(--red); }
+
+.legend-text { font-size: 0.82rem; font-weight: 800; }
+.legend-text span { color: var(--text-muted); font-size: 0.72rem; display: block; font-weight: 700; }
+
+/* Empty */
+.empty {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted); font-weight: 600;
+}
+.empty svg { width: 60px; height: 60px; stroke: var(--gold-2); fill: none; stroke-width: 1.5; margin-bottom: 16px; }
+.empty h2 { font-size: 1.3rem; color: var(--text); margin-bottom: 8px; }
+
+/* Loading */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 4px solid rgba(245,158,11,0.2);
+  border-top-color: var(--gold-2);
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  body { padding: 12px; }
+  .header { padding: 14px 16px; }
+  .logo-text h1 { font-size: 1.1rem; }
+  .card { padding: 18px; }
+  .rank-table th, .rank-table td { padding: 10px 6px; font-size: 0.78rem; }
+  .player-cell img { width: 32px; height: 32px; }
+  .player-cell .name { font-size: 0.82rem; }
+  .tab { padding: 10px 14px; font-size: 0.8rem; }
+  .podium-photo { width: 70px; height: 70px; }
+  .podium-item.first .podium-photo { width: 80px; height: 80px; }
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>الإنجازات</h1>
+        <p>النقاط والألقاب 🏅</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        الرئيسية
+      </a>
+      <a href="leaderboard.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        الترتيب
+      </a>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('points', this)">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      ترتيب النقاط
+    </button>
+    <button class="tab" onclick="switchTab('achievements', this)">
+      <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+      الإنجازات
+    </button>
+    <button class="tab" onclick="switchTab('system', this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      نظام النقاط
+    </button>
+  </div>
+
+  <div id="content">
+    <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ncrycgbrstafdouvipzc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73";
+
+let allPlayers = [];
+let allEvents = [];
+let allAchievements = [];
+let currentTab = "points";
+
+function defaultPhoto() {
+  return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fef3c7"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4 4-7 8-7s8 3 8 7" fill="none" stroke="%23d97706" stroke-width="1.5"/></svg>';
+}
+
+function escapeHTML(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function playerStats(pid) {
+  const ev = allEvents.filter(e => e.player_id === pid);
+  const goals = ev.filter(e => e.event_type === "goal").length;
+  const assists = ev.filter(e => e.event_type === "assist").length;
+  const motm = ev.filter(e => e.event_type === "motm").length;
+  const yellow = ev.filter(e => e.event_type === "yellow").length;
+  const red = ev.filter(e => e.event_type === "red").length;
+  // نظام النقاط: هدف=3، تمريرة=2، MOTM=5، أصفر=-1، أحمر=-3
+  const points = goals * 3 + assists * 2 + motm * 5 - yellow - red * 3;
+  return { goals, assists, motm, yellow, red, points };
+}
+
+// ===== Load =====
+async function loadAll() {
+  try {
+    const [pRes, eRes, aRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/players?select=*`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/events?select=*&order=event_date.desc`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/achievements?select=*&order=earned_at.desc`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      })
+    ]);
+    allPlayers = await pRes.json() || [];
+    allEvents = await eRes.json() || [];
+    allAchievements = await aRes.json() || [];
+    render();
+  } catch (e) {
+    document.getElementById("content").innerHTML = `<div class="loading">خطأ: ${e.message}</div>`;
+  }
+}
+
+// ===== Tabs =====
+window.switchTab = function(name, btn) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  currentTab = name;
+  render();
+};
+
+function render() {
+  const content = document.getElementById("content");
+
+  if (currentTab === "points") renderPoints(content);
+  else if (currentTab === "achievements") renderAchievements(content);
+  else if (currentTab === "system") renderSystem(content);
+}
+
+// ===== Points Ranking =====
+function renderPoints(content) {
+  if (allPlayers.length === 0) {
+    content.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><h2>ما فيه لاعبين</h2></div>`;
+    return;
+  }
+
+  const ranked = allPlayers.map(p => ({
+    ...p,
+    stats: playerStats(p.id)
+  })).sort((a, b) => b.stats.points - a.stats.points);
+
+  const top3 = ranked.slice(0, 3);
+
+  // ترتيب المنصة
+  const podiumOrder = [];
+  if (top3[1]) podiumOrder.push({ ...top3[1], rank: 2 });
+  if (top3[0]) podiumOrder.push({ ...top3[0], rank: 1 });
+  if (top3[2]) podiumOrder.push({ ...top3[2], rank: 3 });
+
+  const podiumHTML = top3.length > 0 ? `
+    <div class="podium">
+      ${podiumOrder.map(p => {
+        const cls = p.rank === 1 ? "first" : p.rank === 2 ? "second" : "third";
+        const crown = p.rank === 1 ? 
+          '<path d="M2 18h20l-2-10-5 4-3-6-3 6-5-4z"/><path d="M4 22h16"/>' :
+          p.rank === 2 ?
+          '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>' :
+          '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>';
+        return `
+          <div class="podium-item ${cls}">
+            <div class="podium-crown">
+              <svg viewBox="0 0 24 24">${crown}</svg>
+            </div>
+            <img class="podium-photo" src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+            <div class="podium-name">${escapeHTML(p.name)}</div>
+            <div class="podium-pos">${p.position}</div>
+            <div class="podium-points">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              ${p.stats.points}
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  ` : '';
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        أفضل 3 لاعبين
+      </h2>
+      ${podiumHTML}
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        ترتيب النقاط الكامل
+      </h2>
+      <div style="overflow-x:auto">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th>اللاعب</th>
+              <th class="center">أهداف</th>
+              <th class="center">تمريرات</th>
+              <th class="center">MOTM</th>
+              <th class="center">أصفر</th>
+              <th class="center">أحمر</th>
+              <th class="center">النقاط</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ranked.map((p, i) => `
+              <tr>
+                <td><span class="rank-num ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span></td>
+                <td>
+                  <div class="player-cell">
+                    <img src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+                    <div>
+                      <div class="name">${escapeHTML(p.name)}</div>
+                      <div class="pos">${p.position}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="td-num green">${p.stats.goals}</td>
+                <td class="td-num purple">${p.stats.assists}</td>
+                <td class="td-num gold">${p.stats.motm}</td>
+                <td class="td-num gold">${p.stats.yellow || '-'}</td>
+                <td class="td-num red">${p.stats.red || '-'}</td>
+                <td class="td-num purple" style="font-size:1.05rem">${p.stats.points}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ===== Achievements =====
+function renderAchievements(content) {
+  if (allAchievements.length === 0) {
+    content.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <h2>ما فيه إنجازات</h2>
+        <p>الأدمن يقدر يزيد إنجازات من لوحة التحكم</p>
+      </div>
+    `;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        الإنجازات المسجلة
+      </h2>
+      <div class="ach-grid">
+        ${allAchievements.map(a => {
+          const p = allPlayers.find(x => x.id === a.player_id);
+          const date = new Date(a.earned_at).toLocaleDateString("ar-DZ");
+          return `
+            <div class="ach-card">
+              <div class="ach-icon">
+                <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+              </div>
+              <div class="ach-player">
+                <img src="${p ? (p.photo || defaultPhoto()) : defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+                <div class="ach-player-info">
+                  <div class="name">${p ? escapeHTML(p.name) : 'لاعب محذوف'}</div>
+                  <div class="pos">${p ? p.position : ''}</div>
+                </div>
+              </div>
+              <div class="ach-title">${escapeHTML(a.title)}</div>
+              ${a.description ? `<div class="ach-desc">${escapeHTML(a.description)}</div>` : ''}
+              <div class="ach-date">${date}</div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+// ===== System Explanation =====
+function renderSystem(content) {
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        كيفاش تتحسب النقاط؟
+      </h2>
+      <div class="points-legend">
+        <div class="legend-item">
+          <div class="legend-icon g">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/></svg>
+          </div>
+          <div class="legend-text">هدف <span>+3 نقاط</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon b">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <div class="legend-text">تمريرة حاسمة <span>+2 نقاط</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon y">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="legend-text">رجل الماتش <span>+5 نقاط</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon y">
+            <svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg>
+          </div>
+          <div class="legend-text">بطاقة صفراء <span>-1 نقطة</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-icon r">
+            <svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg>
+          </div>
+          <div class="legend-text">بطاقة حمراء <span>-3 نقاط</span></div>
+        </div>
+      </div>
+      <div style="padding:16px;background:var(--gold-light);border-radius:14px;font-size:0.85rem;font-weight:700;color:#78350f;line-height:1.7">
+        <strong>ملاحظة:</strong> النقاط تتحسب تلقائياً من الأحداث اللي يسجلها الأدمن في لوحة التحكم.<br>
+        كل هدف، تمريرة، رجل ماتش، أو بطاقة يتحسبو مباشرة في ترتيب النقاط.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        الألقاب المتوفرة
+      </h2>
+      <div class="ach-grid">
+        ${[
+          { title: "هداف الشهر", desc: "أكثر لاعب يسجل أهداف في شهر", icon: "goal" },
+          { title: "أفضل صانع أهداف", desc: "أكثر لاعب يوزع تمريرات حاسمة", icon: "assist" },
+          { title: "أفضل مدافع", desc: "أفضل مدافع حسب التقييم", icon: "shield" },
+          { title: "أفضل حارس", desc: "أفضل حارس حسب التقييم", icon: "shield" },
+          { title: "أفضل لاعب في الشهر", desc: "الأفضل في كل شي", icon: "star" },
+          { title: "أكثر لاعب تطور", desc: "اللي تحسن مستواه بزاف", icon: "trending" },
+          { title: "الرجل الحديدي", desc: "اللي ما يغيبش على الماتشات", icon: "clock" },
+          { title: "القائد", desc: "قائد الفريق وروحه", icon: "shield" }
+        ].map(a => `
+          <div class="ach-card" style="opacity:0.85">
+            <div class="ach-icon" style="background:linear-gradient(135deg,#94a3b8,#64748b);box-shadow:none">
+              <svg viewBox="0 0 24 24">
+                ${a.icon === "goal" ? '<circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/>' :
+                  a.icon === "assist" ? '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' :
+                  a.icon === "shield" ? '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' :
+                  a.icon === "star" ? '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' :
+                  a.icon === "trending" ? '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>' :
+                  a.icon === "clock" ? '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' :
+                  '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'}
+              </svg>
+            </div>
+            <div class="ach-title" style="color:var(--text)">${a.title}</div>
+            <div class="ach-desc">${a.desc}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+loadAll();
+</script>
+</body>
+</html>
