@@ -273,4 +273,31 @@ async function load() {
     const aWon = m.score_a > m.score_b;
     const bWon = m.score_b > m.score_a;
     return `<div class="match-card">
-      <div class="match-date">📅 ${
+      <div class="match-date">📅 ${formatDate(m.match_date)}</div>
+      <div class="match-teams">
+        <div class="team">
+          <div class="team-name">${m.team_a}</div>
+        </div>
+        <div class="score">
+          <span class="${aWon ? 'score-win' : bWon ? 'score-lose' : ''}">${m.score_a}</span>
+          <span style="color:#cbd5e1">-</span>
+          <span class="${bWon ? 'score-win' : aWon ? 'score-lose' : ''}">${m.score_b}</span>
+        </div>
+        <div class="team team-b">
+          <div class="team-name">${m.team_b}</div>
+        </div>
+      </div>
+      ${motm ? `<div class="match-motm">
+        ⭐ رجل الماتش:
+        <img src="${motm.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+        <span>${motm.name}</span>
+      </div>` : ''}
+      ${m.notes ? `<div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:12px;font-size:0.85rem;color:#64748b;font-weight:600">📝 ${m.notes}</div>` : ''}
+    </div>`;
+  }).join("")}</div>`;
+}
+
+load();
+</script>
+</body>
+</html>
