@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>الإحصائيات وسجل الأهداف 📊</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #16a34a; --green-bright: #22c55e; --green-deep: #15803d; --green-light: #dcfce7;
+  --red: #dc2626; --red-bright: #ef4444; --red-light: #fee2e2;
+  --blue: #3b82f6; --blue-light: #dbeafe;
+  --gold: #f59e0b; --gold-light: #fef3c7;
+  --purple: #8b5cf6; --purple-light: #ede9fe;
+  --bg: #f8fafc; --card: #ffffff; --text: #0f172a;
+  --text-muted: #64748b; --border: #e2e8f0;
+}
+body {
+  font-family: 'Cairo', system-ui, sans-serif; color: var(--text);
+  background: var(--bg); min-height: 100vh; padding: 20px;
+  direction: rtl; position: relative; overflow-x: hidden;
+}
+body::before, body::after {
+  content: ""; position: fixed; border-radius: 50%;
+  filter: blur(120px); z-index: 0; pointer-events: none;
+}
+body::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%);
+  top: -150px; right: -150px;
+}
+body::after {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(245,158,11,0.18), transparent 70%);
+  bottom: -200px; left: -200px;
+}
+.grid-bg {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(22,163,74,0.06) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(22,163,74,0.06) 1px, transparent 1px);
+  background-size: 45px 45px; z-index: 0; pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+.header {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 18px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+  box-shadow: 0 10px 40px rgba(15,23,42,0.08);
+}
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+}
+.logo-icon svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.logo-text h1 {
+  font-size: 1.3rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-text p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+.nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 14px;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none;
+  transition: all 0.25s; text-decoration: none; font-family: inherit; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-white { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
+.btn-white:hover { transform: translateY(-2px); background: var(--green-light); }
+
+/* Tabs */
+.main-tabs {
+  display: flex; gap: 8px; margin-bottom: 22px;
+  overflow-x: auto; padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.main-tabs::-webkit-scrollbar { display: none; }
+.main-tab {
+  padding: 12px 22px; border-radius: 14px;
+  border: 2px solid var(--border); background: #fff;
+  font-weight: 800; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.25s; font-family: inherit; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px; color: var(--text);
+}
+.main-tab svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.main-tab:hover { border-color: var(--blue); transform: translateY(-2px); }
+.main-tab.active {
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
+  color: #fff; border-color: transparent;
+  box-shadow: 0 8px 20px rgba(59,130,246,0.35);
+}
+
+.panel { display: none; animation: fadeIn 0.3s; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 24px; margin-bottom: 22px;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.06);
+}
+.card h2 {
+  font-size: 1.15rem; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px; font-weight: 800;
+}
+.card h2 svg { width: 22px; height: 22px; stroke: var(--blue); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Big stat cards */
+.big-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.big-stat {
+  background: linear-gradient(160deg, #fff, #f8fafc);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.big-stat:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(15,23,42,0.1); }
+.big-stat::before {
+  content: ""; position: absolute; top: 0; right: 0; left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--green), var(--green-bright));
+}
+.big-stat.blue::before { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+.big-stat.gold::before { background: linear-gradient(90deg, var(--gold), #fbbf24); }
+.big-stat.red::before { background: linear-gradient(90deg, var(--red), var(--red-bright)); }
+.big-stat.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+
+.big-stat-icon {
+  width: 50px; height: 50px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.big-stat-icon svg { width: 24px; height: 24px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.big-stat-icon.g { background: var(--green-light); } .big-stat-icon.g svg { stroke: var(--green-deep); }
+.big-stat-icon.b { background: var(--blue-light); } .big-stat-icon.b svg { stroke: #1d4ed8; }
+.big-stat-icon.y { background: var(--gold-light); } .big-stat-icon.y svg { stroke: #d97706; }
+.big-stat-icon.r { background: var(--red-light); } .big-stat-icon.r svg { stroke: var(--red); }
+.big-stat-icon.p { background: var(--purple-light); } .big-stat-icon.p svg { stroke: #6d28d9; }
+
+.big-stat-num { font-size: 2rem; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+.big-stat-lbl { font-size: 0.82rem; color: var(--text-muted); font-weight: 700; }
+
+/* Rankings table */
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.rank-table thead tr { background: #f8fafc; }
+.rank-table th {
+  padding: 14px 12px;
+  text-align: right;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--text);
+  border-bottom: 2px solid var(--border);
+}
+.rank-table th.center { text-align: center; }
+.rank-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.rank-table tr:last-child td { border-bottom: none; }
+.rank-table tr:hover { background: var(--green-light); }
+.rank-table .rank-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 10px;
+  background: #f1f5f9; font-weight: 900; color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.rank-table .rank-num.top1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: #fff; }
+.rank-table .rank-num.top2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #fff; }
+.rank-table .rank-num.top3 { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; }
+
+.player-cell {
+  display: flex; align-items: center; gap: 10px;
+}
+.player-cell img {
+  width: 40px; height: 40px; border-radius: 12px; object-fit: cover;
+  border: 2px solid var(--green-bright);
+  background: var(--green-light);
+  flex-shrink: 0;
+}
+.player-cell .info { min-width: 0; }
+.player-cell .name { font-weight: 800; font-size: 0.9rem; }
+.player-cell .pos { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; }
+
+.td-num { text-align: center; font-weight: 900; }
+.td-num.green { color: var(--green-deep); }
+.td-num.gold { color: #d97706; }
+.td-num.red { color: var(--red); }
+.td-num.purple { color: #6d28d9; }
+
+/* Goal log */
+.goal-log {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.goal-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border-right: 4px solid var(--green);
+  transition: all 0.2s;
+}
+.goal-item:hover { background: var(--green-light); transform: translateX(-3px); }
+.goal-item.assist { border-right-color: var(--blue); }
+.goal-item.yellow { border-right-color: #fbbf24; }
+.goal-item.red { border-right-color: var(--red); }
+.goal-item.motm { border-right-color: var(--gold); }
+
+.goal-icon {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: #fff; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.goal-icon svg { width: 22px; height: 22px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.goal-item.goal .goal-icon svg { stroke: var(--green); }
+.goal-item.assist .goal-icon svg { stroke: var(--blue); }
+.goal-item.yellow .goal-icon svg { stroke: #fbbf24; }
+.goal-item.red .goal-icon svg { stroke: var(--red); }
+.goal-item.motm .goal-icon svg { stroke: var(--gold); }
+
+.goal-info { flex: 1; min-width: 0; }
+.goal-info strong { display: block; font-size: 0.95rem; font-weight: 800; margin-bottom: 4px; }
+.goal-info span { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+.goal-minute {
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--green-deep);
+  flex-shrink: 0;
+}
+.goal-item.assist .goal-minute { color: #1d4ed8; }
+.goal-item.yellow .goal-minute { color: #d97706; }
+.goal-item.red .goal-minute { color: var(--red); }
+.goal-item.motm .goal-minute { color: #d97706; }
+
+/* Form (best) */
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+.form-card {
+  background: linear-gradient(160deg, #fff, #f8fafc);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  text-align: center;
+  transition: all 0.25s;
+}
+.form-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(15,23,42,0.1); }
+.form-card h4 {
+  font-size: 0.85rem; color: var(--text-muted);
+  font-weight: 800; margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+.form-player {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; background: #fff;
+  border-radius: 14px; margin-bottom: 8px;
+}
+.form-player:last-child { margin-bottom: 0; }
+.form-player img {
+  width: 44px; height: 44px; border-radius: 12px; object-fit: cover;
+  border: 2px solid var(--green-bright); flex-shrink: 0;
+}
+.form-player .fname { font-weight: 800; font-size: 0.9rem; }
+.form-player .fsub { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; }
+.form-player .fval {
+  margin-right: auto;
+  font-weight: 900; font-size: 1.05rem;
+  color: var(--green-deep);
+}
+
+/* Filters */
+.filter-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.filter-btn {
+  padding: 8px 16px; border-radius: 12px;
+  border: 2px solid var(--border); background: #fff;
+  font-weight: 700; font-size: 0.8rem; cursor: pointer;
+  transition: all 0.25s; font-family: inherit; color: var(--text);
+}
+.filter-btn:hover { border-color: var(--blue); }
+.filter-btn.active {
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
+  color: #fff; border-color: transparent;
+}
+
+/* Empty */
+.empty {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted); font-weight: 600;
+}
+.empty svg { width: 60px; height: 60px; stroke: var(--blue); fill: none; stroke-width: 1.5; margin-bottom: 16px; }
+
+/* Loading */
+.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 4px solid rgba(59,130,246,0.2);
+  border-top-color: var(--blue);
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  body { padding: 12px; }
+  .header { padding: 14px 16px; }
+  .logo-text h1 { font-size: 1.1rem; }
+  .card { padding: 18px; }
+  .big-stat-num { font-size: 1.6rem; }
+  .rank-table th, .rank-table td { padding: 10px 6px; font-size: 0.78rem; }
+  .player-cell img { width: 32px; height: 32px; }
+  .player-cell .name { font-size: 0.82rem; }
+  .main-tab { padding: 10px 14px; font-size: 0.82rem; }
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>الإحصائيات</h1>
+        <p>سجل الأهداف والأرقام الكاملة 📊</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <a href="index.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        الرئيسية
+      </a>
+      <a href="leaderboard.html" class="btn btn-white">
+        <svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        الترتيب
+      </a>
+    </div>
+  </header>
+
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="switchTab('overview', this)">
+      <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      نظرة عامة
+    </button>
+    <button class="main-tab" onclick="switchTab('scorers', this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/></svg>
+      الهدافين
+    </button>
+    <button class="main-tab" onclick="switchTab('assists', this)">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      صناع الأهداف
+    </button>
+    <button class="main-tab" onclick="switchTab('defenders', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      المدافعين
+    </button>
+    <button class="main-tab" onclick="switchTab('goallog', this)">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      سجل الأهداف
+    </button>
+    <button class="main-tab" onclick="switchTab('forms', this)">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      الفورم
+    </button>
+  </div>
+
+  <div id="content">
+    <div class="loading"><div class="spinner"></div>جاري التحميل...</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ncrycgbrstafdouvipzc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73";
+
+let allPlayers = [];
+let allEvents = [];
+let allMatches = [];
+let currentTab = "overview";
+let goalFilter = "all";
+
+function calcOverall(p) {
+  return Math.round((p.strength + p.shot_power + p.pace + p.dribbling + p.passing + p.defense) / 6);
+}
+
+function defaultPhoto() {
+  return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23dcfce7"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4 4-7 8-7s8 3 8 7" fill="none" stroke="%2316a34a" stroke-width="1.5"/></svg>';
+}
+
+function escapeHTML(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function playerStats(pid) {
+  const ev = allEvents.filter(e => e.player_id === pid);
+  return {
+    goals: ev.filter(e => e.event_type === "goal").length,
+    assists: ev.filter(e => e.event_type === "assist").length,
+    motm: ev.filter(e => e.event_type === "motm").length,
+    yellow: ev.filter(e => e.event_type === "yellow").length,
+    red: ev.filter(e => e.event_type === "red").length,
+    ratings: ev.filter(e => e.event_type === "rating").map(e => e.rating),
+  };
+}
+
+function avgRating(stats) {
+  if (stats.ratings.length === 0) return 0;
+  return stats.ratings.reduce((a, b) => a + b, 0) / stats.ratings.length;
+}
+
+// ===== Load =====
+async function loadAll() {
+  try {
+    const [pRes, eRes, mRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/players?select=*`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/events?select=*&order=event_date.desc`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/matches?select=*&order=match_date.desc`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      })
+    ]);
+    allPlayers = await pRes.json() || [];
+    allEvents = await eRes.json() || [];
+    allMatches = await mRes.json() || [];
+    render();
+  } catch (e) {
+    document.getElementById("content").innerHTML = `<div class="loading">خطأ: ${e.message}</div>`;
+  }
+}
+
+// ===== Tabs =====
+window.switchTab = function(name, btn) {
+  document.querySelectorAll(".main-tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  currentTab = name;
+  render();
+};
+
+window.setGoalFilter = function(f) {
+  goalFilter = f;
+  render();
+};
+
+// ===== Render =====
+function render() {
+  const content = document.getElementById("content");
+
+  if (allPlayers.length === 0) {
+    content.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        <h2>ما فيه بيانات</h2>
+        <p>زيد لاعبين وماتشات الأول</p>
+      </div>`;
+    return;
+  }
+
+  if (currentTab === "overview") renderOverview(content);
+  else if (currentTab === "scorers") renderScorers(content);
+  else if (currentTab === "assists") renderAssists(content);
+  else if (currentTab === "defenders") renderDefenders(content);
+  else if (currentTab === "goallog") renderGoalLog(content);
+  else if (currentTab === "forms") renderForms(content);
+}
+
+// ===== Overview =====
+function renderOverview(content) {
+  const totalGoals = allEvents.filter(e => e.event_type === "goal").length;
+  const totalAssists = allEvents.filter(e => e.event_type === "assist").length;
+  const totalMotm = allEvents.filter(e => e.event_type === "motm").length;
+  const totalYellow = allEvents.filter(e => e.event_type === "yellow").length;
+  const totalRed = allEvents.filter(e => e.event_type === "red").length;
+  const totalMatches = allMatches.length;
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        الإحصائيات الكاملة
+      </h2>
+      <div class="big-stats">
+        <div class="big-stat">
+          <div class="big-stat-icon g"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/></svg></div>
+          <div class="big-stat-num">${totalGoals}</div>
+          <div class="big-stat-lbl">مجموع الأهداف</div>
+        </div>
+        <div class="big-stat blue">
+          <div class="big-stat-icon b"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="big-stat-num">${totalAssists}</div>
+          <div class="big-stat-lbl">تمريرات حاسمة</div>
+        </div>
+        <div class="big-stat gold">
+          <div class="big-stat-icon y"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div class="big-stat-num">${totalMotm}</div>
+          <div class="big-stat-lbl">رجل الماتش</div>
+        </div>
+        <div class="big-stat purple">
+          <div class="big-stat-icon p"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/></svg></div>
+          <div class="big-stat-num">${totalMatches}</div>
+          <div class="big-stat-lbl">ماتشات</div>
+        </div>
+        <div class="big-stat gold">
+          <div class="big-stat-icon y"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg></div>
+          <div class="big-stat-num">${totalYellow}</div>
+          <div class="big-stat-lbl">بطاقات صفراء</div>
+        </div>
+        <div class="big-stat red">
+          <div class="big-stat-icon r"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg></div>
+          <div class="big-stat-num">${totalRed}</div>
+          <div class="big-stat-lbl">بطاقات حمراء</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ===== Scorers =====
+function renderScorers(content) {
+  const ranked = allPlayers.map(p => ({
+    ...p,
+    ...playerStats(p.id),
+    avg: avgRating(playerStats(p.id))
+  })).filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals);
+
+  if (ranked.length === 0) {
+    content.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><h2>ما فيه أهداف بعد</h2></div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/></svg>
+        ترتيب الهدافين
+      </h2>
+      <div style="overflow-x:auto">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th>اللاعب</th>
+              <th class="center">أهداف</th>
+              <th class="center">تمريرات</th>
+              <th class="center">رجل الماتش</th>
+              <th class="center">متوسط التقييم</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ranked.map((p, i) => `
+              <tr>
+                <td><span class="rank-num ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span></td>
+                <td>
+                  <div class="player-cell">
+                    <img src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+                    <div class="info">
+                      <div class="name">${escapeHTML(p.name)}</div>
+                      <div class="pos">${p.position}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="td-num green">${p.goals}</td>
+                <td class="td-num purple">${p.assists}</td>
+                <td class="td-num gold">${p.motm}</td>
+                <td class="td-num">${p.avg > 0 ? p.avg.toFixed(1) : '-'}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ===== Assists =====
+function renderAssists(content) {
+  const ranked = allPlayers.map(p => ({
+    ...p,
+    ...playerStats(p.id),
+    avg: avgRating(playerStats(p.id))
+  })).filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists);
+
+  if (ranked.length === 0) {
+    content.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h2>ما فيه تمريرات بعد</h2></div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        ترتيب صنّاع الأهداف
+      </h2>
+      <div style="overflow-x:auto">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th>اللاعب</th>
+              <th class="center">تمريرات</th>
+              <th class="center">أهداف</th>
+              <th class="center">رجل الماتش</th>
+              <th class="center">متوسط التقييم</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ranked.map((p, i) => `
+              <tr>
+                <td><span class="rank-num ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span></td>
+                <td>
+                  <div class="player-cell">
+                    <img src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+                    <div class="info">
+                      <div class="name">${escapeHTML(p.name)}</div>
+                      <div class="pos">${p.position}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="td-num purple">${p.assists}</td>
+                <td class="td-num green">${p.goals}</td>
+                <td class="td-num gold">${p.motm}</td>
+                <td class="td-num">${p.avg > 0 ? p.avg.toFixed(1) : '-'}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ===== Defenders =====
+function renderDefenders(content) {
+  const ranked = allPlayers.filter(p => p.position === "مدافع" || p.position === "حارس")
+    .map(p => ({ ...p, ...playerStats(p.id), avg: avgRating(playerStats(p.id)) }))
+    .sort((a, b) => {
+      if (b.avg !== a.avg) return b.avg - a.avg;
+      return b.defense - a.defense;
+    });
+
+  if (ranked.length === 0) {
+    content.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><h2>ما فيه مدافعين</h2></div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        أفضل المدافعين والحراس
+      </h2>
+      <div style="overflow-x:auto">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th style="width:50px">#</th>
+              <th>اللاعب</th>
+              <th class="center">الدفاع</th>
+              <th class="center">القوة</th>
+              <th class="center">التقييم الكلي</th>
+              <th class="center">متوسط الأداء</th>
+              <th class="center">بطاقات</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ranked.map((p, i) => `
+              <tr>
+                <td><span class="rank-num ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span></td>
+                <td>
+                  <div class="player-cell">
+                    <img src="${p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+                    <div class="info">
+                      <div class="name">${escapeHTML(p.name)}</div>
+                      <div class="pos">${p.position}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="td-num green">${p.defense}</td>
+                <td class="td-num">${p.strength}</td>
+                <td class="td-num purple">${calcOverall(p)}</td>
+                <td class="td-num">${p.avg > 0 ? p.avg.toFixed(1) : '-'}</td>
+                <td class="td-num">
+                  ${p.yellow > 0 ? `<span style="color:#d97706">${p.yellow}🟨</span>` : ''}
+                  ${p.red > 0 ? `<span style="color:var(--red)">${p.red}🟥</span>` : ''}
+                  ${p.yellow === 0 && p.red === 0 ? '-' : ''}
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ===== Goal Log =====
+function renderGoalLog(content) {
+  let events = allEvents;
+  if (goalFilter !== "all") events = events.filter(e => e.event_type === goalFilter);
+
+  const typeInfo = {
+    goal: { label: "هدف", svg: '<circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20M2 12h20"/>' },
+    assist: { label: "تمريرة حاسمة", svg: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
+    yellow: { label: "بطاقة صفراء", svg: '<rect x="6" y="3" width="12" height="18" rx="2"/>' },
+    red: { label: "بطاقة حمراء", svg: '<rect x="6" y="3" width="12" height="18" rx="2"/>' },
+    motm: { label: "رجل الماتش", svg: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' }
+  };
+
+  const filters = [
+    { key: "all", label: "الكل" },
+    { key: "goal", label: "الأهداف" },
+    { key: "assist", label: "التمريرات" },
+    { key: "yellow", label: "الصفراء" },
+    { key: "red", label: "الحمراء" },
+    { key: "motm", label: "رجل الماتش" }
+  ];
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+        سجل الأحداث — كل شي مسجل
+      </h2>
+      <div class="filter-row">
+        ${filters.map(f => `<button class="filter-btn ${f.key === goalFilter ? 'active' : ''}" onclick="setGoalFilter('${f.key}')">${f.label}</button>`).join("")}
+      </div>
+      ${events.length === 0 ? `
+        <div class="empty"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/></svg><h2>ما فيه أحداث</h2></div>
+      ` : `
+        <div class="goal-log">
+          ${events.slice(0, 100).map(ev => {
+            const p = allPlayers.find(x => x.id === ev.player_id);
+            const m = allMatches.find(x => x.id === ev.match_id);
+            const info = typeInfo[ev.event_type] || typeInfo.goal;
+            const date = new Date(ev.event_date).toLocaleDateString("ar-DZ");
+            return `<div class="goal-item ${ev.event_type}">
+              <div class="goal-icon">
+                <svg viewBox="0 0 24 24">${info.svg}</svg>
+              </div>
+              <div class="goal-info">
+                <strong>${p ? escapeHTML(p.name) : 'لاعب محذوف'} — ${info.label}</strong>
+                <span>${date}${m ? ' · ' + m.team_a + ' ضد ' + m.team_b + ' (' + m.score_a + '-' + m.score_b + ')' : ''}${ev.note ? ' · ' + ev.note : ''}</span>
+              </div>
+              ${ev.minute ? `<div class="goal-minute">د ${ev.minute}'</div>` : ''}
+            </div>`;
+          }).join("")}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// ===== Forms (آخر ماتشات) =====
+function renderForms(content) {
+  // آخر 3 ماتشات
+  const recentMatches = allMatches.slice(0, 3);
+  
+  // نحسبو أفضل لاعبين في كل ماتش حسب التقييم
+  const cards = recentMatches.map(m => {
+    const matchEvents = allEvents.filter(e => e.match_id === m.id);
+    const ratingEvents = matchEvents.filter(e => e.event_type === "rating");
+    
+    // متوسط التقييم لكل لاعب
+    const playerRatings = {};
+    ratingEvents.forEach(r => {
+      if (!playerRatings[r.player_id]) playerRatings[r.player_id] = [];
+      playerRatings[r.player_id].push(r.rating);
+    });
+    
+    const ranked = Object.entries(playerRatings).map(([pid, ratings]) => {
+      const p = allPlayers.find(x => x.id === pid);
+      return { p, avg: ratings.reduce((a, b) => a + b, 0) / ratings.length };
+    }).filter(x => x.p).sort((a, b) => b.avg - a.avg).slice(0, 3);
+    
+    const date = new Date(m.match_date).toLocaleDateString("ar-DZ");
+    
+    return `
+      <div class="form-card">
+        <h4>${m.team_a} ${m.score_a} - ${m.score_b} ${m.team_b}</h4>
+        <div style="font-size:0.72rem;color:var(--text-muted);font-weight:700;margin-bottom:12px">${date}</div>
+        ${ranked.length === 0 ? 
+          `<p style="color:var(--text-muted);font-size:0.85rem;font-weight:600">ما فيه تقييمات</p>` :
+          ranked.map((r, i) => `
+            <div class="form-player">
+              <img src="${r.p.photo || defaultPhoto()}" onerror="this.src='${defaultPhoto()}'" />
+              <div>
+                <div class="fname">${i + 1}. ${escapeHTML(r.p.name)}</div>
+                <div class="fsub">${r.p.position}</div>
+              </div>
+              <div class="fval">${r.avg.toFixed(1)}</div>
+            </div>
+          `).join("")
+        }
+      </div>
+    `;
+  }).join("");
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        فورم آخر الماتشات — أفضل اللاعبين
+      </h2>
+      ${recentMatches.length === 0 ? `
+        <div class="empty"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><h2>ما فيه ماتشات</h2></div>
+      ` : `<div class="form-row">${cards}</div>`}
+    </div>
+  `;
+}
+
+loadAll();
+</script>
+</body>
+</html>
