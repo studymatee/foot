@@ -40,7 +40,6 @@ body {
   position: relative;
 }
 
-/* ==== خلفية فاتحة بأضواء ==== */
 body::before, body::after {
   content: "";
   position: fixed;
@@ -76,64 +75,8 @@ body::after {
   -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
 }
 
-/* ==== ملعب متحرك ==== */
-.field-bg {
-  position: fixed;
-  bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 140%;
-  max-width: 1400px;
-  height: 55vh;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  mask-image: linear-gradient(to top, black 30%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
-}
-.field-svg {
-  width: 100%; height: 100%;
-}
-.field-line {
-  fill: none;
-  stroke: rgba(22,163,74,0.25);
-  stroke-width: 3;
-}
-.field-circle {
-  fill: none;
-  stroke: rgba(22,163,74,0.25);
-  stroke-width: 3;
-  animation: dashRotate 30s linear infinite;
-  transform-origin: center;
-}
-@keyframes dashRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.field-spot {
-  fill: rgba(22,163,74,0.3);
-}
-
-/* الكرة المتحركة */
-.ball {
-  position: fixed;
-  width: 40px; height: 40px;
-  z-index: 0;
-  opacity: 0.35;
-  pointer-events: none;
-  animation: ballMove 22s ease-in-out infinite;
-}
-@keyframes ballMove {
-  0%   { top: 75%; left: 10%; transform: rotate(0deg); }
-  20%  { top: 60%; left: 25%; transform: rotate(180deg); }
-  40%  { top: 70%; left: 50%; transform: rotate(360deg); }
-  60%  { top: 55%; left: 75%; transform: rotate(540deg); }
-  80%  { top: 68%; left: 90%; transform: rotate(720deg); }
-  100% { top: 75%; left: 10%; transform: rotate(900deg); }
-}
-
 .container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
 
-/* ==== Header ==== */
 .header {
   background: rgba(255,255,255,0.85);
   border: 1px solid var(--border);
@@ -166,7 +109,6 @@ body::after {
   background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 24px rgba(22,163,74,0.4);
-  position: relative;
 }
 .logo-icon svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -174,7 +116,6 @@ body::after {
   font-size: 1.4rem; font-weight: 900;
   background: linear-gradient(135deg, var(--green-deep), var(--green));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  letter-spacing: -0.5px;
 }
 .logo-text p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 
@@ -192,7 +133,6 @@ body::after {
 .flag-strip .w { background: #ffffff; }
 .flag-strip .r { background: #dc2626; }
 
-/* ==== Nav Buttons ==== */
 .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; z-index: 1; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -221,7 +161,6 @@ body::after {
 }
 .btn-gold:hover { transform: translateY(-2px); }
 
-/* ==== Stats bar ==== */
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -254,7 +193,6 @@ body::after {
 .stat-mini-num { font-size: 1.3rem; font-weight: 900; line-height: 1; margin-bottom: 3px; }
 .stat-mini-lbl { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; }
 
-/* ==== Tabs / Filters ==== */
 .tabs-row {
   display: flex; gap: 8px; margin-bottom: 20px;
   overflow-x: auto; padding-bottom: 6px; scrollbar-width: none;
@@ -274,7 +212,6 @@ body::after {
   box-shadow: 0 8px 20px rgba(22,163,74,0.35);
 }
 
-/* ==== Players Grid ==== */
 .players-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -357,7 +294,6 @@ body::after {
   -webkit-mask-composite: xor; mask-composite: exclude;
 }
 
-/* Stats preview */
 .stats-mini {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -371,9 +307,8 @@ body::after {
   border-radius: 10px;
 }
 .stat-mini-val { font-weight: 900; font-size: 1rem; color: var(--green-deep); }
-.stat-mini-lbl { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+.stat-mini-lbl2 { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 
-/* Points badge */
 .points-badge {
   position: absolute;
   top: 12px; left: 12px;
@@ -391,7 +326,6 @@ body::after {
 }
 .points-badge svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 2.5; }
 
-/* Loading / Empty */
 .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-weight: 600; }
 .spinner {
   width: 44px; height: 44px; border-radius: 50%;
@@ -416,40 +350,6 @@ body::after {
 .empty h2 { font-size: 1.4rem; margin-bottom: 10px; color: var(--text); }
 .empty p { font-size: 0.95rem; margin-bottom: 24px; color: var(--text-muted); font-weight: 600; }
 
-/* ===== Rai Banner ===== */
-.rai-banner {
-  position: fixed;
-  bottom: 20px; left: 50%;
-  transform: translateX(-50%) translateY(120px);
-  background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
-  color: #78350f;
-  padding: 16px 28px;
-  border-radius: 20px;
-  font-weight: 900;
-  font-size: 1.05rem;
-  box-shadow: 0 15px 50px rgba(245,158,11,0.6), 0 0 0 4px rgba(255,255,255,0.4);
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  opacity: 0;
-  transition: all 0.5s cubic-bezier(.4,0,.2,1);
-}
-.rai-banner.show {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-  animation: raiDance 0.6s ease-in-out infinite alternate;
-}
-@keyframes raiDance {
-  from { transform: translateX(-50%) translateY(0) rotate(-1deg); }
-  to { transform: translateX(-50%) translateY(-6px) rotate(1deg); }
-}
-.rai-banner svg {
-  width: 28px; height: 28px;
-  stroke: #78350f; fill: none;
-  stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
-}
-
 @media (max-width: 480px) {
   body { padding: 12px; }
   .header { padding: 14px 16px; border-radius: 20px; }
@@ -460,44 +360,12 @@ body::after {
   .player-photo, .player-photo-wrap { width: 64px; height: 64px; border-radius: 16px; }
   .overall-circle { width: 52px; height: 52px; font-size: 1.15rem; }
   .btn { padding: 9px 14px; font-size: 0.8rem; }
-  .rai-banner { font-size: 0.85rem; padding: 12px 18px; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
 <body>
 <div class="grid-bg"></div>
-
-<!-- ملعب متحرك في الخلفية -->
-<div class="field-bg">
-  <svg class="field-svg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice">
-    <!-- أرض الملعب -->
-    <rect x="50" y="50" width="900" height="400" class="field-line" rx="8"/>
-    <!-- خط المنتصف -->
-    <line x1="500" y1="50" x2="500" y2="450" class="field-line"/>
-    <!-- الدائرة الوسطى -->
-    <circle cx="500" cy="250" r="70" class="field-circle"/>
-    <circle cx="500" cy="250" r="5" class="field-spot"/>
-    <!-- منطقة الجزاء اليمنى -->
-    <rect x="750" y="150" width="150" height="200" class="field-line" rx="4"/>
-    <rect x="850" y="200" width="50" height="100" class="field-line" rx="4"/>
-    <!-- منطقة الجزاء اليسرى -->
-    <rect x="100" y="150" width="150" height="200" class="field-line" rx="4"/>
-    <rect x="100" y="200" width="50" height="100" class="field-line" rx="4"/>
-    <!-- الأقواس -->
-    <path d="M 900 200 Q 870 250 900 300" class="field-line"/>
-    <path d="M 100 200 Q 130 250 100 300" class="field-line"/>
-  </svg>
-</div>
-
-<!-- كرة متحركة -->
-<svg class="ball" viewBox="0 0 24 24">
-  <circle cx="12" cy="12" r="10" fill="#f8fafc" stroke="#16a34a" stroke-width="1.5"/>
-  <path d="M12 6l3 2-1 3.5h-4L9 8z" fill="#16a34a"/>
-  <path d="M12 18l-3-2 1-3.5h4l1 3.5z" fill="#16a34a"/>
-  <path d="M4 12l3-2 2 3.5L7 17z" fill="#16a34a"/>
-  <path d="M20 12l-3-2-2 3.5L17 17z" fill="#16a34a"/>
-</svg>
 
 <div class="container">
   <header class="header">
@@ -531,10 +399,7 @@ body::after {
     </div>
   </header>
 
-  <!-- إحصائيات عامة -->
   <div class="stats-bar" id="statsBar"></div>
-
-  <!-- فلترة حسب المركز -->
   <div class="tabs-row" id="filterTabs"></div>
 
   <div id="content">
@@ -545,12 +410,6 @@ body::after {
   </div>
 </div>
 
-<!-- Rai Banner -->
-<div class="rai-banner" id="raiBanner">
-  <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-  <span>🎵 يا ليلة يا ليلة... كرة الحومة 🇩🇿</span>
-</div>
-
 <script>
 const SUPABASE_URL = "https://ncrycgbrstafdouvipzc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6t2dkU27Rkinsoo8MhYAEQ_FSgj4G73";
@@ -559,6 +418,33 @@ let allPlayers = [];
 let allEvents = [];
 let allMatches = [];
 let currentFilter = "all";
+
+// ===== دالة آمنة للجلب =====
+async function fetchSafe(table, query = "") {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/${table}${query ? "?" + query : ""}`;
+    const res = await fetch(url, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    if (!res.ok) {
+      console.error(`خطأ في ${table}: ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    // نضمنو إنو array
+    if (!Array.isArray(data)) {
+      console.error(`${table} ماشي array:`, data);
+      return [];
+    }
+    return data;
+  } catch (e) {
+    console.error(`فشل ${table}:`, e);
+    return [];
+  }
+}
 
 function calcOverall(p) {
   return Math.round((p.strength + p.shot_power + p.pace + p.dribbling + p.passing + p.defense) / 6);
@@ -578,7 +464,7 @@ function defaultPhoto() {
 
 function escapeHTML(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 
-// حساب النقاط لكل لاعب من الأحداث
+// حساب إحصائيات اللاعب من الأحداث
 function calcPlayerStats(playerId) {
   const ev = allEvents.filter(e => e.player_id === playerId);
   const goals = ev.filter(e => e.event_type === "goal").length;
@@ -588,7 +474,6 @@ function calcPlayerStats(playerId) {
   const red = ev.filter(e => e.event_type === "red").length;
   const ratings = ev.filter(e => e.event_type === "rating").map(e => e.rating);
   const avgRating = ratings.length > 0 ? (ratings.reduce((a,b)=>a+b,0) / ratings.length) : 0;
-  // نظام النقاط: هدف=3، تمريرة=2، رجل الماتش=5، بطاقة صفراء=-1، حمراء=-3
   const points = goals * 3 + assists * 2 + motm * 5 - yellow - red * 3;
   return { goals, assists, motm, yellow, red, points, avgRating, ratingsCount: ratings.length };
 }
@@ -596,21 +481,15 @@ function calcPlayerStats(playerId) {
 // ===== Load =====
 async function loadAll() {
   try {
-    const [playersRes, eventsRes, matchesRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/players?select=*&order=created_at.desc`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      }),
-      fetch(`${SUPABASE_URL}/rest/v1/events?select=*`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      }),
-      fetch(`${SUPABASE_URL}/rest/v1/matches?select=id`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-      })
+    const [players, events, matches] = await Promise.all([
+      fetchSafe("players", "select=*&order=created_at.desc"),
+      fetchSafe("events", "select=*"),
+      fetchSafe("matches", "select=id")
     ]);
 
-    allPlayers = await playersRes.json() || [];
-    allEvents = await eventsRes.json() || [];
-    allMatches = await matchesRes.json() || [];
+    allPlayers = players;
+    allEvents = events;
+    allMatches = matches;
 
     renderStatsBar();
     renderFilterTabs();
@@ -709,7 +588,6 @@ function renderPlayers() {
   let filtered = [...allPlayers];
 
   if (currentFilter === "top") {
-    // نرتبو حسب النقاط
     filtered.sort((a, b) => calcPlayerStats(b.id).points - calcPlayerStats(a.id).points);
   } else if (currentFilter !== "all") {
     filtered = filtered.filter(p => p.position === currentFilter);
@@ -747,15 +625,15 @@ function cardHTML(p) {
       <div class="stats-mini">
         <div class="stat-mini-item">
           <div class="stat-mini-val">${stats.goals}</div>
-          <div class="stat-mini-lbl">أهداف</div>
+          <div class="stat-mini-lbl2">أهداف</div>
         </div>
         <div class="stat-mini-item">
           <div class="stat-mini-val">${stats.assists}</div>
-          <div class="stat-mini-lbl">تمريرات</div>
+          <div class="stat-mini-lbl2">تمريرات</div>
         </div>
         <div class="stat-mini-item">
           <div class="stat-mini-val">${stats.ratingsCount > 0 ? stats.avgRating.toFixed(1) : '-'}</div>
-          <div class="stat-mini-lbl">تقييم</div>
+          <div class="stat-mini-lbl2">تقييم</div>
         </div>
       </div>
     </a>
